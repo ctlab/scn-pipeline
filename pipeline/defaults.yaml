@@ -1,0 +1,60 @@
+## Variables related to pipeline run mode
+
+Merge: False
+RunSingleAnalysis: True
+AdditionalMerge: []
+
+test_mode: no
+
+## Variables related to kallisto
+
+IndHomo: /scratch/mfiruleva/winter/genomes/homo
+IndMus: /scratch/mfiruleva/winter/genomes/mus
+IndRat: /scratch/mfiruleva/winter/genomes/rat
+
+WhitelistDir: /scratch/mfiruleva/GSEs_processing/wget_and_process
+
+ConfHomo: /mnt/tank/scratch/mfiruleva/scn/config/config_homo.yaml
+ConfMus: /mnt/tank/scratch/mfiruleva/scn/config/config_mus.yaml
+ConfRat: /mnt/tank/scratch/mfiruleva/scn/config/config_rat.yaml
+
+white_10xv2: /files/10xv2_whitelist.txt
+white_10xv3: /files/10xv3_whitelist.txt
+
+## Variables related to cell filtration
+
+EmptyDropsLower: 100
+FilterMito: True
+FilterUMI: False
+WholeUMI: True
+
+## Variables related to dimensionality reduction
+
+PcaVarGenes: True
+PcaComponentsTotal: 50
+PcaComponentsTsne: 20
+PcaComponentsUmap: 20
+
+## Variables related to clustering
+
+Clustering:
+  GraphBased:
+    PcaComponents: 20
+    Resolution: c(0.2, 0.4, 0.6)
+
+## Variables related to container settings
+
+PathToBamToFastq: /usr/bin/bamtofastq-1.2.0
+PathToFastTsne: /opt/conda/pkgs/fit-sne-1.1.0-h3ddc34e_0/bin/fast_tsne
+PathToSinImage: docker://mfiruleva/scn:latest
+PathToSingularityDir: /mnt/tank/scratch/mfiruleva/scn/config
+
+## Variables related to conda settings
+
+PathToCondaYml: /mnt/tank/scratch/mfiruleva/scn/config/65ef9760.yaml
+PathToCondaDir: /mnt/tank/scratch/mfiruleva/scn/config
+CondaFull: /mnt/tank/scratch/mfiruleva/scn/config/65ef9760
+
+## Variables related to task manager
+Threads: 4
+KallistoThreads: 4

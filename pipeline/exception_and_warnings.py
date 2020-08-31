@@ -1,0 +1,2 @@
+class SkippingStepWarning(RuntimeWarning):
+    pass
