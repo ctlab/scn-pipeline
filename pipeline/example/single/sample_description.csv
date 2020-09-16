@@ -1,0 +1,2 @@
+,GSE,study_accession,secondary_sample_accession,sample_accession,experiment_accession,run_accession,tax_id,scientific_name,fastq_ftp,submitted_ftp,technology
+1,GSE01,PRJNA01,SRS01,SAMN01,SRX01,SRR01,10090,Mus musculus,https://www.dropbox.com/s/p6922qh1ntl5yaq/R1.gz?dl=1;https://www.dropbox.com/s/6d31dd8nimakwlp/R2.gz?dl=1,ftp.sra.ebi.ac.uk/vol1/srr/SRR_01/01/SRR_01,10x

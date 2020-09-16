@@ -63,7 +63,7 @@ rule define_version:
     shell:
          """
          python scripts/define_version.py --sra_file {input} --threads {threads} --index {index} --transcripts_to_genes {transcripts_to_genes} --white_10xv2 {params.white_10xv2} --white_10xv3 {params.white_10xv3}
-         prefetch {params.run_id} -o {output.sra}
+         prefetch {params.run_id} -o {output.sra} --max-size 50G
          parallel-fastq-dump -s {output.sra} --split-files --threads {threads} -O . --tmpdir . --gzip
          """
 

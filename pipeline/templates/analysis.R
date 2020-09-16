@@ -13,145 +13,148 @@ setwd("{{ AnalysisFolder }}")
 set.seed(1)
 
 ## FUNCTIONS
-{% include 'add_metadata.R' %}
-{% include 'draw_plots.R' %}
+{% include 'create_obj/add_metadata.R' %}
+{% include 'visualization/draw_plots.R' %}
 {% if FilterMito %}
-{% include 'get_conf_interval.R' %}
+{% include 'filtering/get_conf_interval.R' %}
 {% endif %}
 {%  if FilterMito and AnalysisType == "many"%}
-{% include 'filter_mito_func.R' %}
+{% include 'filtering/filter_mito_func.R' %}
 {% endif %}
 
 {% if FilterUMI and not WholeUMI %}
-{% include 'peakfinder.R' %}
+{% include 'filtering/peakfinder.R' %}
 {% endif %}
 {%  if FilterUMI and not WholeUMI and AnalysisType == "many"%}
-{% include 'filter_umi_func.R' %}
+{% include 'filtering/filter_umi_func.R' %}
 {% endif %}
 
 
 ## GATHERING DATA TOGETHER
 {% if AnalysisType == "single" %}
-    {% include 'intro_single.R' %}
+    {% include 'create_obj/intro_single.R' %}
 {% elif AnalysisType == "many" %}
-    {% include 'intro_merge.R' %}
+    {% include 'create_obj/intro_merge.R' %}
 {% endif %}
 
 
 ## CREATE DIRECTORY FOR PLOTS
-{% include 'plot_dir_creation.R' %}
+{% include 'visualization/plot_dir_creation.R' %}
 
 
 ## Number of cells before
-{% include 'cells_before.R' %}
+{% include 'create_obj/cells_before.R' %}
 
 
 ## FILTER MT CONTENT
 {% if FilterMito and not test_mode %}
-{% include 'mt_filtering.R' %}
+{% include 'filtering/mt_filtering.R' %}
 {% endif %}
 
 
 {% if not FilterUMI or WholeUMI %}
 ## NORMALIZATION
-{% include 'normalization.R' %}
+{% include 'normalization/normalization.R' %}
+
+
+{% if AnalysisType == "many" %}
+  {% include 'integration/integration.R' %}
+{% endif %}
 
 
 ## PCA
-{% include 'pca.R' %}
+{% include 'dim_reduction/pca.R' %}
 
 
 ## TSNE
-{% include 'tsne.R' %}
+{% include 'dim_reduction/tsne.R' %}
 
 
 ## UMAP
-{% include 'umap.R' %}
+{% include 'dim_reduction/umap.R' %}
 
 
 ## CLUSTERING
-{% include 'clustering.R' %}
+{% include 'clustering/clustering.R' %}
 
 
 ## VISUALIZATION
-{% include 'visualization.R' %}
+{% include 'visualization/visualization.R' %}
 
 
 ## AVERAGING
-{% include 'average.R' %}
+{% include 'clustering/average.R' %}
 
 
 ## FINDING ANS SAVING MARKERS
-{% include 'markers.R' %}
+{% include 'clustering/markers.R' %}
 
 
 ## SAVING
-{% include 'save.R' %}
-{% if db == "GEO" and AnalysisType == "single" %}
-  {% include 'adata_single.R' %}
-{% elif db == "MTAB" and AnalysisType == "single" %}
-  {% include 'adata_single_mtab.R' %}
-{% endif %}
-{% if AnalysisType == "many" %}
-  {% include 'adata_merge.R' %}
+{% include 'save_obj/save.R' %}
+{% if AnalysisType == "single" %}
+  {% include 'save_obj/adata_single.R' %}
+{% elif AnalysisType == "many" %}
+  {% include 'save_obj/adata_merge.R' %}
 {% endif %}
 
 
 ## Number of cells after
-{% include 'cells_after.R' %}
+{% include 'save_obj/cells_after.R' %}
 
 
 
 {% else %}
 ## FILTER nUMI
-{% include 'umi_filtering.R' %}
+{% include 'filtering/umi_filtering.R' %}
 
 
 ## NORMALIZATION: FILTERED DATASET
-{% include 'normalization.R' %}
+{% include 'normalization/normalization.R' %}
 
+{% if AnalysisType == "many" %}
+  {% include 'integration/integration.R' %}
+{% endif %}
 
 ## PCA: FILTERED DATASET
-{% include 'pca.R' %}
+{% include 'dim_reduction/pca.R' %}
 
 
 ## TSNE: FILTERED DATASET
-{% include 'tsne.R' %}
+{% include 'dim_reduction/tsne.R' %}
 
 
 ## UMAP: FILTERED DATASET
-{% include 'umap.R' %}
+{% include 'dim_reduction/umap.R' %}
 
 
 ## CLUSTERING: FILTERED DATASET
-{% include 'clustering.R' %}
+{% include 'clustering/clustering.R' %}
 
 
 ## VISUALIZATION: FILTERED DATASET
-{% include 'visualization.R' %}
+{% include 'visualization/visualization.R' %}
 
 
 ## AVERAGING: FILTERED DATASET
-{% include 'average.R' %}
+{% include 'clustering/average.R' %}
 
 
 ## FINDING MARKERS: FILTERED DATASET
-{% include 'markers.R' %}
+{% include 'clustering/markers.R' %}
 
 
 ## SAVING: FILTERED DATASET
-{% include 'save.R' %}
-{% if db == "GEO" and AnalysisType == "single" %}
-  {% include 'adata_single.R' %}
-{% elif db == "MTAB" and AnalysisType == "single" %}
-  {% include 'adata_single_mtab.R' %}
-{% endif %}
-{% if AnalysisType == "many" %}
-  {% include 'adata_merge.R' %}
+{% include 'save_obj/save.R' %}
+
+{% if AnalysisType == "single" %}
+  {% include 'save_obj/adata_single.R' %}
+{% elif AnalysisType == "many" %}
+  {% include 'save_obj/adata_merge.R' %}
 {% endif %}
 
 
 ## Number of cells after
-{% include 'cells_after.R' %}
+{% include 'save_obj/cells_after.R' %}
 {% endif %}
 

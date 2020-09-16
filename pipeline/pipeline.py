@@ -11,7 +11,7 @@ def pipeline(config_file_name: str) -> None:
         run_dict.update(config_dict)
     if type(run_dict['Objects']) is str:
         assert type(run_dict['SampleIds']) == type(
-            run_dict['Objects']), "Probably you specify one SampleIds and several Objects or vice versa"
+            run_dict['Objects']), "Probably you specified one SampleIds and several Objects or vice versa"
         run_dict['Objects'] = run_dict['Objects'].split()
         run_dict['SampleIds'] = run_dict['SampleIds'].split()
     assert run_dict['RunName'], "You must specify RunName"

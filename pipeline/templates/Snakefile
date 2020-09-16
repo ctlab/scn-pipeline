@@ -1,26 +1,29 @@
 import pandas as pd
 
+{% if AnalysisType == "single" %}
 description = pd.read_csv('sample_description.csv').reset_index().to_dict("records")
-sample_id = description[0]['secondary_sample_accession']
+{% endif %}
 
-{% if cell_ranger and not fq_dump and not bam %}
+{% if AnalysisType == "single" and cell_ranger and not fq_dump and not bam %}
 barcodes =  {x['run_accession']: x['fastq_ftp'].split(';')[0] for x in description}
-{% elif cell_ranger and not fq_dump and bam %}
+{% elif AnalysisType == "single" and cell_ranger and not fq_dump and bam %}
 bam_file = description[0]['submitted_ftp'].split(';')[0]
-{% elif cell_ranger and fq_dump %}
+{% elif AnalysisType == "single" and cell_ranger and fq_dump %}
 runs = [x['run_accession'] for x in description]
 {% endif %}
 
+{% if AnalysisType == "single" %}
 include: "rules/get_data.smk"
 {% if cell_ranger %}
 include: "rules/define_version.smk"
 {% endif %}
 include: "rules/run_kallisto.smk"
 include: "rules/get_counts.smk"
+{% endif %}
 include: "rules/secondary_analysis.smk"
 include: "rules/add_uns.smk"
 
 localrules: add_uns_to_h5ad
 
 rule all:
-    input: f"{sample_id}_with_uns.h5ad"
+    input: "{{ RunName }}_with_uns.h5ad"

@@ -40,7 +40,7 @@ PcaComponentsUmap: 20
 Clustering:
   GraphBased:
     PcaComponents: 20
-    Resolution: c(0.2, 0.4, 0.6)
+    Resolution: 0.2, 0.4, 0.6
 
 ## Variables related to container settings
 

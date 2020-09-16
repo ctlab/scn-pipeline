@@ -9,23 +9,20 @@ import scanpy
 
 def get_markers(markers_file: str) -> dict:
     markers = pd.read_csv(markers_file, sep='\t')
-    res = {}
-    for k, v in markers.to_dict().items():
-        res[k] = np.array(list(v.values()))
-    return res
+    return {k: np.array(list(v.values())) for k, v in markers.to_dict().items()}
 
 {% if db == 'GEO' %}
 
 def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str) -> None:
-    description = pd.read_csv(s_d).reset_index().to_dict("records")[0]
     file = scanpy.read_h5ad(h5)
+
+    {% if not test_mode %}
+    description = pd.read_csv(s_d).reset_index().to_dict("records")[0]
     file.uns["expType"] = "counts"
     file.uns["public"] = True
     file.uns["curated"] = False
     file.uns["gse"] = description['GSE']
-    file.uns["token"] = description['secondary_sample_accession']
     file.uns["geo"] = f"https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc={description['GSE']}"
-    file.uns["sra"] = f"https://www.ncbi.nlm.nih.gov/sra/{description['secondary_sample_accession']}"
     file.uns["study_accession"] = description['study_accession']
     file.uns["species"] = description['scientific_name']
     if description['technology'] != "10x":
@@ -34,8 +31,6 @@ def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str) -> None:
         with open(kallisto_script, 'r') as run_file:
             data = run_file.read().replace('\n', '')
         file.uns["technology"] = re.findall('10xv[0-9]*', data)
-
-    {% if not test_mode %}
 
     link = Request(f'https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc={description["GSE"]}',
                    headers={'User-Agent': 'Mozilla/5.0'})
@@ -56,11 +51,29 @@ def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str) -> None:
     study_des = xmldoc.findall('EXPERIMENT_PACKAGE/STUDY/DESCRIPTOR/STUDY_ABSTRACT')[0].text
     file.uns["description"] = re.sub('Overall design:\s*', '', study_des)
     file.uns["design"] = re.sub('Overall design:\s*', '', re.findall('Overall design:.*', study_des)[0])
-    file.uns['markers'] = {
-        'markers0.2': get_markers('markers/SCT_snn_res.0.2/markers.tsv'),
-        'markers0.4': get_markers('markers/SCT_snn_res.0.4/markers.tsv'),
-        'markers0.6': get_markers('markers/SCT_snn_res.0.6/markers.tsv')}
+
+
+    {% if AnalysisType == 'single' %}
+
+    file.uns["token"] = description['secondary_sample_accession']
+    file.uns["sra"] = f"https://www.ncbi.nlm.nih.gov/sra/{description['secondary_sample_accession']}"
+
+    {% elif AnalysisType == 'many' %}
+
+    file.uns["token"] = description['GSE']
+
     {% endif %}
+
+    {% endif %}
+
+    file.uns['markers'] = dict()
+    resolutions = re.sub('\s', '', "{{ Clustering.GraphBased.Resolution }}").split(',')
+    for res in resolutions:
+{% if AnalysisType == 'single' %}
+        file.uns['markers'][f'markers{res}'] = get_markers(f'markers/SCT_snn_res.{res}/markers.tsv')
+{% else %}
+        file.uns['markers'][f'markers{res}'] = get_markers(f'markers/integrated_snn_res.{res}/markers.tsv')
+{% endif %}
 
     file.write_h5ad(h5_out, compression='gzip')
 
@@ -96,11 +109,14 @@ def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str) -> None:
     file.uns["title"] = re.sub('.*Title[\s]*', '', re.findall(r"Investigation Title.*\n", brief)[0])
     file.uns["description"] = re.sub('Experiment Description[\s]*', '', re.findall(r"Experiment Description.*\n", brief)[0])
     file.uns["design"] = re.sub('Protocol Description[\s]*', '', re.findall(r"Protocol Description.*\n", brief)[0])
-    markers = pd.read_csv('markers.tsv', sep='\t')
-    res = {}
-    for k, v in markers.to_dict().items():
-        res[k] = np.array(list(v.values()))
-    file.uns["markers"] = {'markers0.6': res}  # todo multiple resolutions
+    file.uns['markers'] = dict()
+    resolutions = re.sub('\s', '', "{{ Clustering.GraphBased.Resolution }}").split(',')
+    for res in resolutions:
+{ % if AnalysisType == 'single' %}
+        file.uns['markers'][f'markers{res}'] = get_markers(f'markers/SCT_snn_res.{res}/markers.tsv')
+{ % else %}
+        file.uns['markers'][f'markers{res}'] = get_markers(f'markers/integrated_snn_res.{res}/markers.tsv')
+{ % endif %}
     file.write_h5ad(h5_out, compression='gzip')
 
 {% endif %}
