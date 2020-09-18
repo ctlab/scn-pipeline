@@ -1,3 +1,5 @@
+container: "docker://mfiruleva/scn:latest"
+
 import pandas as pd
 
 {% if AnalysisType == "single" %}

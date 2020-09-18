@@ -17,6 +17,7 @@ def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str) -> None:
     file = scanpy.read_h5ad(h5)
 
     {% if not test_mode %}
+
     description = pd.read_csv(s_d).reset_index().to_dict("records")[0]
     file.uns["expType"] = "counts"
     file.uns["public"] = True
