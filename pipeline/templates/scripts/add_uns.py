@@ -113,11 +113,11 @@ def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str) -> None:
     file.uns['markers'] = dict()
     resolutions = re.sub('\s', '', "{{ Clustering.GraphBased.Resolution }}").split(',')
     for res in resolutions:
-{ % if AnalysisType == 'single' %}
+{% if AnalysisType == 'single' %}
         file.uns['markers'][f'markers{res}'] = get_markers(f'markers/SCT_snn_res.{res}/markers.tsv')
-{ % else %}
+{% else %}
         file.uns['markers'][f'markers{res}'] = get_markers(f'markers/integrated_snn_res.{res}/markers.tsv')
-{ % endif %}
+{% endif %}
     file.write_h5ad(h5_out, compression='gzip')
 
 {% endif %}

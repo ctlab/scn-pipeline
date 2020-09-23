@@ -4,6 +4,7 @@ Merge: False
 RunSingleAnalysis: True
 AdditionalMerge: []
 
+bulk_like: no
 test_mode: no
 
 ## Variables related to kallisto

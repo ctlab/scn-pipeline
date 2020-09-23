@@ -1,0 +1,13 @@
+RunName: GSE153313
+Organism:
+- Mus musculus
+Objects:
+- /mnt/space/work/GSE153313/
+SampleIds:
+- GSE153313
+PathsToCounts: no
+PathToAnalysis: /mnt/space/work/GSE153313
+test_mode: yes
+bulk_like: yes
+
+ConfTest: /mnt/space/work/pipeline/example/config.yml
