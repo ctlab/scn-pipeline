@@ -15,7 +15,7 @@ import pandas as pd
 
 description = pd.read_csv('sample_description.csv')
 srs_ids = set(description['SRS'])
-srr = {srr_run: 0 for srr_run in description['run_accession']}
+srr = {srr_run: 0 for srr_run in description['SRR']}
 
 def get_srr_files_for_srs(wildcards) -> list:
     """
