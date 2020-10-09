@@ -19,5 +19,5 @@ rule get_fastq:
     threads: {{ KallistoThreads }}
     shell:
         """
-        parallel-fastq-dump -s {output.sra_file} --split-files --threads {threads} -O {output.fq_dir} --tmpdir {output.fq_dir} --gzip
+        parallel-fastq-dump -s {input.sra_file} --split-files --threads {threads} -O {output.fq_dir} --tmpdir {output.fq_dir} --gzip
         """
