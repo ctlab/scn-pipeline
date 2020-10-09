@@ -132,5 +132,5 @@ def analysis(config: dict) -> None:
     if config['RunSingleAnalysis'] and config['bulk_like']:
         config_local = copy.deepcopy(config)
         config_local["AnalysisFolder"] = config["PathToAnalysis"]
-        config_local["Organism"] = config["Organism"][0]
+        config_local["Organism"] = config["Organism"]
         analysis_run(config_local)

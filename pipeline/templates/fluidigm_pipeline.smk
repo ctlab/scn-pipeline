@@ -10,11 +10,12 @@ configfile: "{{ ConfRat }}"
 configfile: "{{ ConfTest }}"
 {% endif %}
 
+import os
 import pandas as pd
 
 description = pd.read_csv('sample_description.csv')
 srs_ids = set(description['SRS'])
-
+srr = {srr_run: 0 for srr_run in description['run_accession']}
 
 def get_srr_files_for_srs(wildcards) -> list:
     """
@@ -26,6 +27,18 @@ def get_srr_files_for_srs(wildcards) -> list:
     print(f"SRR ids for {wildcards.srs}: {','.join(srr_list)}")
     srr_files = expand(rules.kallisto.output.tsv, srr=srr_list)
     return srr_files
+
+def prefetch_input(wildcards):
+    """
+    :param wildcards: wildcards with srr ID
+    :return:
+    """
+    global srr
+    if os.path.exists(f"out/{wildcards.srr}.sra"):
+        return f"out/{wildcards.srr}.sra"
+    srr[wildcards.srr] += 1
+    assert 'Too much trials', srr[wildcards.srr] > 5
+    checkpoints.get_sra.get(srr=wildcards.srr)
 
 
 include: "rules/get_data.smk"

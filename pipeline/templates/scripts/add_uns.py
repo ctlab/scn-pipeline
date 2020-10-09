@@ -11,9 +11,11 @@ def get_markers(markers_file: str) -> dict:
     markers = pd.read_csv(markers_file, sep='\t')
     return {k: np.array(list(v.values())) for k, v in markers.to_dict().items()}
 
+path = "{{ AnalysisFolder }}"
+
 {% if db == 'GEO' %}
 
-def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str) -> None:
+def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str, summary_file: str) -> None:
     file = scanpy.read_h5ad(h5)
 
     {% if not test_mode %}
@@ -65,6 +67,11 @@ def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str) -> None:
 
     {% endif %}
 
+    meta = {'dataset': file.uns['gse'][0], 'sample': file.uns['token'][0], 'organism': file.uns['species'][0],
+            'technology': file.uns['technology'][0], 'path': path}
+    pd.DataFrame.from_dict(meta, orient='index').T.to_csv(summary_file, mode='a', header=False, index=False)
+
+
     {% endif %}
 
     file.uns['markers'] = dict()
@@ -88,7 +95,7 @@ def extract_description(MTAB_ID: str) -> str:
     tab_content = tab_content.decode('latin-1')
     return tab_content
 
-def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str) -> None:
+def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str, summary_file: str) -> None:
     description = pd.read_csv(s_d).reset_index().to_dict("records")[0]
     file = scanpy.read_h5ad(h5)
     file.uns["expType"] = "counts"
@@ -118,6 +125,12 @@ def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str) -> None:
 {% else %}
         file.uns['markers'][f'markers{res}'] = get_markers(f'markers/integrated_snn_res.{res}/markers.tsv')
 {% endif %}
+
+
+    meta = {'dataset': file.uns['gse'][0], 'sample': file.uns['token'][0], 'organism': file.uns['species'][0],
+            'technology': file.uns['technology'][0], 'path': path}
+    pd.DataFrame.from_dict(meta, orient='index').T.to_csv(summary_file, mode='a', header=False, index=False)
+
     file.write_h5ad(h5_out, compression='gzip')
 
 {% endif %}
@@ -132,5 +145,7 @@ if __name__ == '__main__':
                         help='Path to kallisto script')
     parser.add_argument('--s_d', type=str, required=True,
                         help='Path to sample description file')
+    parser.add_argument('--summary_file', type=str, required=True,
+                        help='Path to the summary file')
     args = parser.parse_args()
-    add_uns(args.h5, args.h5_out, args.kallisto_script, args.s_d)
+    add_uns(args.h5, args.h5_out, args.kallisto_script, args.s_d, args.summary_file)

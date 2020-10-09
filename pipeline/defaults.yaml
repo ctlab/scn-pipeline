@@ -41,7 +41,7 @@ PcaComponentsUmap: 20
 Clustering:
   GraphBased:
     PcaComponents: 20
-    Resolution: 0.2, 0.4, 0.6
+    Resolution: 0.2, 0.4, 0.6, 0.8, 1
 
 ## Variables related to container settings
 
@@ -52,10 +52,14 @@ PathToSingularityDir: /mnt/tank/scratch/mfiruleva/scn/config
 
 ## Variables related to conda settings
 
-PathToCondaYml: /mnt/tank/scratch/mfiruleva/scn/config/65ef9760.yaml
+PathToCondaYml: /mnt/tank/scratch/mfiruleva/scn/config/5d179225.yaml
 PathToCondaDir: /mnt/tank/scratch/mfiruleva/scn/config
-CondaFull: /mnt/tank/scratch/mfiruleva/scn/config/65ef9760
+CondaFull: /mnt/tank/scratch/mfiruleva/scn/config/5d179225
 
 ## Variables related to task manager
 Threads: 4
 KallistoThreads: 4
+
+## Varible related to summary file path
+
+SummaryFile: /mnt/tank/scratch/mfiruleva/scn/stats/summary.csv

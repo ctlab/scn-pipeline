@@ -1,4 +1,4 @@
-{% if cell_ranger and bam and db == 'GEO' and not fq_dump%}
+{% if cell_ranger and bam and db == 'GEO' and not fq_dump %}
 
 rule download_bam_header:
     """

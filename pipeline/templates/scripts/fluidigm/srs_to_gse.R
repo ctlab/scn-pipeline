@@ -45,7 +45,7 @@ print("Writing expression table...")
 write.table(x=gse,
             gse_file,
             sep = "\t",
-            row.names = F,
+            row.names = T,
             quote = F
 )
 
