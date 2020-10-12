@@ -67,7 +67,7 @@ def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str, summary_file: 
 
     {% endif %}
 
-    meta = {'dataset': file.uns['gse'][0], 'sample': file.uns['token'][0], 'organism': file.uns['species'][0],
+    meta = {'dataset': file.uns['gse'], 'sample': file.uns['token'], 'organism': file.uns['species'][0],
             'technology': file.uns['technology'][0], 'path': path}
     pd.DataFrame.from_dict(meta, orient='index').T.to_csv(summary_file, mode='a', header=False, index=False)
 
@@ -127,7 +127,7 @@ def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str, summary_file: 
 {% endif %}
 
 
-    meta = {'dataset': file.uns['gse'][0], 'sample': file.uns['token'][0], 'organism': file.uns['species'][0],
+    meta = {'dataset': file.uns['gse'], 'sample': file.uns['token'], 'organism': file.uns['species'][0],
             'technology': file.uns['technology'][0], 'path': path}
     pd.DataFrame.from_dict(meta, orient='index').T.to_csv(summary_file, mode='a', header=False, index=False)
 
