@@ -1,14 +1,15 @@
 import re
+import time
 import xml.etree.ElementTree as ET
 from typing import List
-from urllib.request import urlopen, Request
+from urllib.request import urlopen, Request, URLError
 
 import pandas as pd
 
 ## DEFINE PATTERNS: DATASET LEVEL, SAMPLE LEVEL
 
 df_pattern = re.compile(
-    r"single[\s-]*cell[\s-]*transcriptomic|single[\s-]*cell[\s-]*rna[\s-]*seq|single[\s-]*cell[\s-]*rna[\s-]*sequencing|sc[\s-]*rna[\s-]*seq|drop[\s-]*seq|cell[\s-]*ranger|chromium|cel[\s-]*seq|scrb[\s-]*seq|sure[\s-]*cell|in[\s-]*drops|seurat|fluidigm|smart[\s-]*seq|10x[\s-]*genomics|mars[\s-]*seq",
+    r"single[\s-]*cell[\s-]*transcriptomic|single[\s-]*cell[\s-]*rna[\s-]*seq|single[\s-]*cell[\s-]*rna[\s-]*sequencing|sc[\s-]*rna[\s-]*seq|drop[\s-]*seq|cell[\s-]*ranger|chromium|cel[\s-]*seq|scrb[\s-]*seq|sure[\s-]*cell|in[\s-]*drops|seurat|fluidigm|smart[\s-]*seq|10x[\s-]*genomics|mars[\s-]*seq|cite[\s-]*seq|slide[\s]*seq|split[\s-]*seq|sci[\s-]*rna[\s-]*seq",
     re.IGNORECASE)
 
 sample_pattern = re.compile(
@@ -26,7 +27,10 @@ cell_ranger = re.compile(r"cell[\s-]*ranger|chromium|10x|[\s-]*genomics", re.IGN
 fluidigm = re.compile(r"fluidigm", re.IGNORECASE)
 smart_seq = re.compile(r"smart", re.IGNORECASE)
 mars_seq = re.compile(r"mars", re.IGNORECASE)
-
+cite_seq = re.compile(r"cite[\s-]*seq", re.IGNORECASE)
+slide_seq = re.compile(r"slide[\s]*seq", re.IGNORECASE)
+split_seq = re.compile(r"split[\s-]*seq", re.IGNORECASE)
+sci_seq = re.compile(r"sci[\s-]*rna[\s-]*seq", re.IGNORECASE)
 
 def get_tech(found_patterns: str) -> str:
     """
@@ -53,19 +57,28 @@ def get_tech(found_patterns: str) -> str:
         techs.append('MARS-seq')
     if fluidigm.findall(found_patterns):
         techs.append('Fluidigm')
+    if cite_seq.findall(found_patterns):
+        techs.append('Cite-Seq')
+    if slide_seq.findall(found_patterns):
+        techs.append('Slide-Seq')
+    if split_seq.findall(found_patterns):
+        techs.append('Split-Seq')
+    if sci_seq.findall(found_patterns):
+        techs.append('Sci-RNA-Seq')
     return ','.join(techs)
 
 
 def get_geo_ids(start_date: str, end_date: str, org: str) -> list:
     """
     Find GSE which were published during given period for given organism
-    :param int_period: number of years / months / days
-    :param name_period: name of period (years / moths / days)
+    :param start_date: date from which you want to search gse ids (e.g., "2019/12/02")
+    :param end_date: date until you want to search gse ids (e.g., "2019/12/05")
     :param org: organism name (e.g., Mus musculus)
     :return: GSE ids corresponding to request
     """
-    xml_url = f'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term={start_date}:{end_date}[PDAT]+AND+{re.sub(" ", "%20", org)}[orgn]AND+(gse[ETYP]+OR+gds[ETYP])&retmax=50000&usehistory=y'
-    gds_ids = urlopen(xml_url).read()
+    xml_url = f'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=gds&term={start_date}:{end_date}[PDAT' \
+              f']+AND+{re.sub(" ", "%20", org)}[orgn]AND+(gse[ETYP]+OR+gds[ETYP])&retmax=50000&usehistory=y '
+    gds_ids = url_open(xml_url).read()
     gds_tree = ET.fromstring(gds_ids)
     gds_pattern = re.compile(r'^200')
     gse_ids = list()
@@ -111,7 +124,7 @@ def get_sample_info(df_info: dict, xml_tree) -> dict:
 def get_sra_ids(geo_id: str) -> dict:
     meta_data = dict()
     article = Request(geo_id, headers={'User-Agent': 'Mozilla/5.0'})
-    geo_page = urlopen(article).read()
+    geo_page = url_open(article).read()
     geo_id = re.findall('GSE\d*', geo_page.decode('utf-8'))
     prjna = re.findall('PRJNA\d*', geo_page.decode('utf-8'))
     srp = re.findall('SRP\d*', geo_page.decode('utf-8'))
@@ -123,15 +136,19 @@ def get_sra_ids(geo_id: str) -> dict:
     return meta_data
 
 
-def is_rna_seq(study_tree) -> bool:
+def get_full_meta(ena_descr) -> pd.DataFrame:
     """
-    Check whether GSE is RNA-seq or not
-    :param study_tree: XML-tree from ENA
-    :return: True if GSE contains RNA-seq, else None (=False)
+    Transform text from ENA to pandas dataframe
+    Example:
+    https://www.ebi.ac.uk/ena/portal/api/filereport?accession=PRJNA353098&result=\
+    read_run&fields=study_accession,secondary_sample_accession,sample_accession,experiment_accession,\
+    run_accession,tax_id,scientific_name,fastq_ftp,submitted_ftp,sra_ftp&format=tsv&download=false
+    :param ena_descr: text with all sample ids / run ids / data links for all runs for certain GSE
+    :return: input text converted to dataframe
     """
-    for elem in study_tree.findall('EXPERIMENT_PACKAGE/STUDY/DESCRIPTOR'):
-        if elem.find('STUDY_TYPE').attrib['existing_study_type'] == 'Transcriptome Analysis':
-            return True
+    df = pd.DataFrame([x.split('\t') for x in ena_descr.text.split('\n')])
+    df = df.rename(columns=df.iloc[0]).drop(df.shape[0] - 1).drop(df.index[0])
+    return df
 
 
 def find_patterns(study_desc) -> set:
@@ -150,6 +167,17 @@ def find_patterns(study_desc) -> set:
     return seen_pattern
 
 
+def is_rna_seq(study_tree) -> bool:
+    """
+    Check whether GSE is RNA-seq or not
+    :param study_tree: XML-tree from ENA
+    :return: True if GSE contains RNA-seq, else None (=False)
+    """
+    for elem in study_tree.findall('EXPERIMENT_PACKAGE/STUDY/DESCRIPTOR'):
+        if elem.find('STUDY_TYPE').attrib['existing_study_type'] == 'Transcriptome Analysis':
+            return True
+
+
 def parse_article(study_tree) -> str:
     """
     Parse pubmed article in order to find tech patterns
@@ -160,24 +188,26 @@ def parse_article(study_tree) -> str:
         url = Request(
             f"https://www.ncbi.nlm.nih.gov/pmc/articles/pmid/{study_tree.find('EXPERIMENT_PACKAGE/STUDY/STUDY_LINKS/STUDY_LINK/XREF_LINK/ID').text}",
             headers={'User-Agent': 'Mozilla/5.0'})
-        link = urlopen(url)
+        link = url_open(url)
         article = Request(link.url, headers={'User-Agent': 'Mozilla/5.0'})
-        article_text = urlopen(article).read()
-        return ','.join(find_tech(article_text.decode('utf-8')))
+        article_text = url_open(article).read()
+        return get_tech(article_text.decode('utf-8'))
     except:
         return "NA"
 
 
-def get_full_meta(ena_descr: str) -> pd.DataFrame:
+def url_open(url, timeout=2, n_trials=5, sleep_time=2):
     """
-    Transform text from ENA to pandas dataframe
-    Example:
-    https://www.ebi.ac.uk/ena/portal/api/filereport?accession=PRJNA353098&result=\
-    read_run&fields=study_accession,secondary_sample_accession,sample_accession,experiment_accession,\
-    run_accession,tax_id,scientific_name,fastq_ftp,submitted_ftp,sra_ftp&format=tsv&download=false
-    :param ena_descr: text with all sample ids / run ids / data links for all runs for certain GSE
-    :return: input text converted to dataframe
+    Try open given url during specified timeout
+    :param url: url string
+    :param timeout: in seconds (e.g., 2 = 2 seconds)
+    :param n_trials: number of trials
+    :param sleep_time: in seconds (e.g., 2 = 2 seconds to sleep)
+    :return: http.client.HTTPResponse object in case of success
     """
-    df = pd.DataFrame([x.split('\t') for x in ena_descr.text.split('\n')])
-    df = df.rename(columns=df.iloc[0]).drop(df.shape[0] - 1).drop(df.index[0])
-    return df
+    for trial in range(0, n_trials):
+        try:
+            response = urlopen(url, timeout=timeout)
+            return response
+        except URLError:
+            time.sleep(sleep_time)

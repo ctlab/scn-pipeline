@@ -7,7 +7,11 @@ import pandas as pd
 import requests
 from functions import *
 
-SPECIES = {"mm": "Mus musculus", "rn": "Rattus norvegicus", "hs": "Homo sapiens"}
+SPECIES = {
+    "mm": "Mus musculus",
+    "rn": "Rattus norvegicus",
+    "hs": "Homo sapiens"
+          }
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Find scRNA-seq data in GEO database")
@@ -17,6 +21,7 @@ if __name__ == '__main__':
     parser.add_argument('--file_std', type=str, help='Path to output at study level')
     parser.add_argument('--file_smpl', type=str, help='Path to output at sample level')
     parser.add_argument('--file_meta', type=str, help='Path to output at metadata level')
+    parser.add_argument('--log_file', type=str, help='Path to log file')
     args = parser.parse_args()
 
     ## GET GSE IDS LOADED IN TO GEO DB DURING [START_DATE ; END_DATE]
@@ -46,7 +51,7 @@ if __name__ == '__main__':
             else:
                 continue
             ## LOAD XML TREE WITH BOTH STUDY/SAMPLE INFORMATION LEVELS
-            response = urlopen(url).read()
+            response = url_open(url).read()
             tree = ET.fromstring(response)
             try:
                 if is_rna_seq(tree):
@@ -78,9 +83,10 @@ if __name__ == '__main__':
                                     meta.insert(0, 'GSE', f'{res["geo_id"]}')
                                     meta.to_csv(args.file_meta, sep="\t", mode='a', index=False, header=False)
             except:
-                with open(f'{log}', 'a+') as f:
-                    f.write(f'{res["geo_id"]}\n')
+                with open(args.log_file, 'a+') as f:
+                    f.write(f'{geo}\n')
         except:
-            continue
+            with open(args.log_file, 'a+') as f:
+                f.write(f'{geo}\n')
 
 

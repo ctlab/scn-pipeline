@@ -1,5 +1,11 @@
 ## scn-pipeline/find_sc
 
+## Prerequisites
+
+```commandline
+conda install -y -c bioconda snakemake
+```
+
 ## Repository structure
 
 * `get_files.smk` -- snakemake pipeline
@@ -20,12 +26,14 @@ If you want to exclude some organism from analysis, remove its notation from `SP
 ## Code execution
 
 ```commandline
-snakemake -j 3 -s get_files.smk
+snakemake -j 3 -s get_files.smk --use-conda --conda-prefix $(pwd)
 ```
+
+Conda environment corresponding to `find_sc.yml` will be installed in `$(pwd)` directory.
 
 ## Examine output
 
-`sp` -- wildcard for organism, e.g.:
+`sp` -- wildcard for organism:
 ```python
 SPECIES =   {
             "mm": "Mus musculus",
@@ -33,6 +41,8 @@ SPECIES =   {
             "hs": "Homo sapiens"
             }
 ```
+
+For example, wildcard `sp = mm` correspond to organism `Mus musculus`.
 
 Output files:
 
