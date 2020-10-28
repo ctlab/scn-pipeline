@@ -6,7 +6,7 @@ whole <- get(load("{{ Object }}"))
 whole <- subset(x = whole, features = (rowSums(as.matrix(GetAssayData(object = whole, slot = "counts"))) > round(ncol(whole) * 0.001, 0)))
 whole <- add_metadata(whole)
 
-{% elif Objects and and panglao %}
+{% elif Objects and panglao %}
 whole <- get(load("{{ Object }}"))
 whole@Dimnames[[1]] <-
   make.names(gsub("_ENS.*", "", rownames(whole)), unique = T)
