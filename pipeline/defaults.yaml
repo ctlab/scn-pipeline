@@ -6,6 +6,7 @@ AdditionalMerge: []
 
 bulk_like: no
 test_mode: no
+panglao: no
 
 ## Variables related to kallisto
 
@@ -19,6 +20,7 @@ ConfHomo: /mnt/tank/scratch/mfiruleva/scn/config/config_homo.yaml
 ConfMus: /mnt/tank/scratch/mfiruleva/scn/config/config_mus.yaml
 ConfRat: /mnt/tank/scratch/mfiruleva/scn/config/config_rat.yaml
 
+white_10xv1: /files/10xv1_whitelist.txt
 white_10xv2: /files/10xv2_whitelist.txt
 white_10xv3: /files/10xv3_whitelist.txt
 

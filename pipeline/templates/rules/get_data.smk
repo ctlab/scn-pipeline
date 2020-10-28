@@ -1,14 +1,13 @@
 {% if cell_ranger and bam and db == 'GEO' and not fq_dump %}
 
-rule download_bam_header:
-    """
-    Download the first ~1000 lines from bam file.
-    Pipeline uses this file for definition of 10x version:
-    """
-    output: temp('file.bam') #todo script->bam and rm download_the_beginning_of_bam (rename prepare_lg to it); check all downstram rules are ok
-    log: "logs/prepare_loading.log"
-    benchmark: "benchmarks/prepare_loading.txt"
-    shell: "wget -q -O - ftp://{bam_file} | head -1000 > file.bam"
+
+rule get_bam_header:
+    output: temp("{accession}_tmp.bam")
+    conda: "{{ PathToCondaYml }}"
+    log: "logs/get_bam_{accession}.log"
+    benchmark: "benchmarks/get_bam_{accession}.txt"
+    params: link=lambda wildcards, output: bam_files[f'{wildcards.accession}']
+    shell: "wget -q -O - {params.link} | head -1000 > {output} || true"
 
 {% elif cell_ranger and not bam and db == 'GEO' and not fq_dump %}
 

@@ -154,6 +154,7 @@ if __name__ == '__main__':
 
 {% elif bam and not fq_dump %}
 
+import argparse
 import re
 import warnings
 
@@ -164,8 +165,8 @@ import pysam
 import pandas as pd
 
 
-def get_info(s_d: str, tmp_bam: str, kallisto_script: str, index: str, thread: str, transcripts_to_genes: str,
-             white_10xv1: str, white_10xv2: str, white_10xv3: str) -> None:
+def get_info(s_d: str, tmp_bam: str, index: str, thread: str, transcripts_to_genes: str,
+             white_10xv1: str, white_10xv2: str, white_10xv3: str, kallisto_script='kallisto.sh') -> None:
     whitelist_pathes = {"10xv1": white_10xv1,
                         "10xv2": white_10xv2,
                         "10xv3": white_10xv3}
@@ -198,8 +199,8 @@ def get_info(s_d: str, tmp_bam: str, kallisto_script: str, index: str, thread: s
     whitelist = whitelist_pathes[technology]
     description = pd.read_csv(s_d).reset_index().to_dict("records")
     with open(kallisto_script, 'w') as out_file:
-        bam = [f"{bam_file['bam']}" for bam_file in description]
-        file_names = [f'file{idx}' for idx in range(0, len(bam))]
+        bam = [f"ftp://{bam_file['submitted_ftp'].split(';')[0]}" for bam_file in description]
+        file_names = [f'file{idx}.bam' for idx in range(0, len(bam))]
         if len(file_names) > 30:
             raise Exception(f"Too many files (there are {len(file_names)} files), break the process")
         out_file.write(f"mkfifo {' '.join(file_names)}\n")
@@ -216,14 +217,14 @@ def get_info(s_d: str, tmp_bam: str, kallisto_script: str, index: str, thread: s
                     f"{{ PathToBamToFastq }} --reads-per-fastq=100000000000000 {' '.join(file_names)} out_bam\n")
             out_file.write(f"cat out_bam/*/*R1*.gz > R1.gz\n")
             out_file.write(f"cat out_bam/*/*R2*.gz > R2.gz\n")
-            out_file.write(f"cat out_bam/*/*R3*.gz > R3.gz\n")  # todo out_bam -- temp out
+            out_file.write(f"cat out_bam/*/*R3*.gz > R3.gz\n")
             out_file.write(
                 f'kallisto bus -i {index} -x 2,0,14:1,0,10:0,0,0 -t {thread} -o bus_out/ R1.gz R3.gz R2.gz\n')
         else:
             if len(file_names) > 1:
                 out_file.write(f"samtools cat -o merged.bam file* &\n")
                 out_file.write(
-                    f'kallisto bus --bam -i {index} -x {technology} -t {thread} -o bus_out/ merged.bam\n')  # todo merged.bam -- temp out
+                    f'kallisto bus --bam -i {index} -x {technology} -t {thread} -o bus_out/ merged.bam\n')
             else:
                 out_file.write(
                     f'kallisto bus --bam -i {index} -x {technology} -t {thread} -o bus_out/ {" ".join(file_names)}\n')
@@ -232,5 +233,25 @@ def get_info(s_d: str, tmp_bam: str, kallisto_script: str, index: str, thread: s
         out_file.write(
             f'bustools sort -t {thread} -T bus_out/tmp/ -p bus_out/correct_output.bus | bustools count -o bus_out/genes -g {transcripts_to_genes} -e bus_out/matrix.ec -t bus_out/transcripts.txt --genecounts -\n')
 
-
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Define 10x version")
+    parser.add_argument('--s_d', type=str, required=True,
+                        help='Path to sample description')
+    parser.add_argument('--tmp_bam', type=str, required=True,
+                        help='Downloaded header of bam file')
+    parser.add_argument('--threads', type=int, required=True,
+                        help='Number of threads for kallisto')
+    parser.add_argument('--index', type=str, required=True,
+                        help='Path to kallisto index')
+    parser.add_argument('--transcripts_to_genes', type=str, required=True,
+                        help='Path to transcripts_to_genes file')
+    parser.add_argument('--white_10xv1', type=str, required=True,
+                        help='Path to whitelist for 10xv1')
+    parser.add_argument('--white_10xv2', type=str, required=True,
+                        help='Path to whitelist for 10xv2')
+    parser.add_argument('--white_10xv3', type=str, required=True,
+                        help='Path to whitelist for 10xv3')
+    args = parser.parse_args()
+    get_info(args.s_d, args.tmp_bam , args.index, args.threads, args.transcripts_to_genes,
+             args.white_10xv1, args.white_10xv2, args.white_10xv3)
 {% endif %}

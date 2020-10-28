@@ -15,7 +15,7 @@ path = "{{ AnalysisFolder }}"
 
 {% if db == 'GEO' %}
 
-def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str, summary_file: str) -> None:
+def add_uns(h5: str, h5_out: str, s_d: str, summary_file: str, kallisto_script=None, technology=None) -> None:
     file = scanpy.read_h5ad(h5)
 
     {% if not test_mode %}
@@ -28,12 +28,17 @@ def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str, summary_file: 
     file.uns["geo"] = f"https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc={description['GSE']}"
     file.uns["study_accession"] = description['study_accession']
     file.uns["species"] = description['scientific_name']
-    if description['technology'] != "10x":
-        file.uns["technology"] = description['technology']
+    if isinstance(file.uns["species"], list):
+        file.uns["species"] = file.uns["species"][0]
+    if technology:
+        file.uns['technology'] = technology
     else:
-        with open(kallisto_script, 'r') as run_file:
-            data = run_file.read().replace('\n', '')
-        file.uns["technology"] = re.findall('10xv[0-9]*', data)
+        if description['technology'] != "10x":
+            file.uns["technology"] = description['technology']
+        else:
+            with open(kallisto_script, 'r') as run_file:
+                data = run_file.read().replace('\n', '')
+            file.uns["technology"] = re.findall('10xv[0-9]*', data)[0]
 
     link = Request(f'https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc={description["GSE"]}',
                    headers={'User-Agent': 'Mozilla/5.0'})
@@ -67,8 +72,19 @@ def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str, summary_file: 
 
     {% endif %}
 
-    meta = {'dataset': file.uns['gse'], 'sample': file.uns['token'], 'organism': file.uns['species'][0],
-            'technology': file.uns['technology'][0], 'path': path}
+    {% if panglao %}
+
+    file.uns['processed_from_panglao'] = True
+    file.uns['panglao_url'] = f'https://panglaodb.se/view_data.php?sra="{{ SraId }}"&srs="{{ RunName }}"'
+
+    {% elif not panglao %}
+
+    file.uns['processed_from_panglao'] = False
+
+    {% endif %}
+
+    meta = {'dataset': file.uns['gse'], 'sample': file.uns['token'], 'organism': file.uns['species'],
+            'technology': file.uns['technology'], 'path': path}
     pd.DataFrame.from_dict(meta, orient='index').T.to_csv(summary_file, mode='a', header=False, index=False)
 
 
@@ -141,11 +157,15 @@ if __name__ == '__main__':
                         help='h5 input filename without uns after Seurat processing')
     parser.add_argument('--h5_out', type=str, required=True,
                         help='h5 output filename with filled uns')
-    parser.add_argument('--kallisto_script', type=str, required=True,
+    parser.add_argument('--kallisto_script', type=str, required=False, default=None,
                         help='Path to kallisto script')
     parser.add_argument('--s_d', type=str, required=True,
                         help='Path to sample description file')
     parser.add_argument('--summary_file', type=str, required=True,
                         help='Path to the summary file')
+    parser.add_argument('--technology', type=str, required=False, default=None,
+                        help='Name of used technology; this argument specified in case of panglao db')
     args = parser.parse_args()
-    add_uns(args.h5, args.h5_out, args.kallisto_script, args.s_d, args.summary_file)
+
+    add_uns(h5=args.h5, h5_out=args.h5_out, kallisto_script=args.kallisto_script,
+            s_d=args.s_d, summary_file=args.summary_file, technology=args.technology)

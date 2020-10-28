@@ -1,0 +1,26 @@
+RunName: GSE092865
+Organism:
+- Mus musculus
+Objects:
+- /mnt/space/work/GSE092865/SRS1876792/SRA508949_SRS1876792.sparse.RData
+SampleIds:
+- SRS1876792
+PathsToCounts: no
+PathToAnalysis: /mnt/space/work/GSE092865
+db: GEO
+bam: no
+fq_dump: no
+cell_ranger: yes
+test_mode: yes
+technology: 10x
+panglao: yes
+
+EmptyDropsLower: 50
+FilterMito: False
+PcaComponentsTotal: 30
+
+Clustering:
+  GraphBased:
+    PcaComponents: 20
+    Resolution: 1.5, 2
+

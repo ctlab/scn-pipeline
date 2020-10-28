@@ -2,8 +2,10 @@ rule run_analysis:
     """
     Run Seurat processing using count matrix from the get_count_matrix rule.
     """
-{% if AnalysisType == "single" %}
+{% if AnalysisType == "single" and not panglao %}
     input: rules.get_count_matrix.output.count_mat
+{% elif AnalysisType == "single" and panglao %}
+    input: "{{ Object }}"
 {% else %}
     input: {{ Objects }}
 {% endif %}

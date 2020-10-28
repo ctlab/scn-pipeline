@@ -23,7 +23,7 @@ def prepare_files(work_dir: str, config: dict) -> None:
             task_file.write(fill_template(j2_env, config, 'task.bash'))
             snake_file.write(fill_template(j2_env, config, 'Snakefile'))
             analysis_file.write(fill_template(j2_env, config, 'analysis.R'))
-        if config['AnalysisType'] == 'single':
+        if config['AnalysisType'] == 'single' and not config['panglao']:
             with open(f'{work_dir}/scripts/get_count_matrix.R', "w") as get_count_matrix_file:
                 get_count_matrix_file.write(fill_template(j2_env, config, 'get_count_matrix.R'))
     else:
@@ -40,7 +40,7 @@ def prepare_rules(work_dir: str, config: dict) -> None:
     if not config['bulk_like']:
         j2_env = Environment(loader=FileSystemLoader(TEMPLATE_DIR),
                              trim_blocks=True)
-        if config['AnalysisType'] == 'single':
+        if config['AnalysisType'] == 'single' and not config['panglao']:
             with open(f'{work_dir}/rules/get_data.smk', 'w') as get_f, \
                     open(f'{work_dir}/rules/run_kallisto.smk', 'w') as kallisto, \
                     open(f'{work_dir}/rules/get_counts.smk', 'w') as get_counts:
@@ -118,6 +118,8 @@ def analysis(config: dict) -> None:
                 config_local["Object"] = config["Objects"][i]
             else:
                 config_local["PathToCount"] = config["PathsToCounts"][i]
+            if config['panglao']:
+                config_local['SraId'] = re.findall('SRA\d{1,}', config_local["Object"])[0]
             config_local["SampleId"] = config["SampleIds"][i]
             config_local["RunName"] = config["SampleIds"][i]
             config_local["AnalysisType"] = "single"

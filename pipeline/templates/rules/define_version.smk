@@ -45,11 +45,20 @@ rule define_version:
     Source:
     https://kb.10xgenomics.com/hc/en-us/articles/115003822406-How-does-Cell-Ranger-correct-barcode-sequencing-errors-
     """
-    input: bam="file.bam", s_d="sample_description.csv"
+    input: bams=expand("{accession}_tmp.bam", accession=bam_files.keys()), s_d="sample_description.csv"
     output: kallisto_script="kallisto.sh"
+    conda: "{{ PathToCondaYml }}"
     log: "logs/define_version.log"
     benchmark: "benchmarks/define_version.txt"
-    shell: "python scripts/define_version.py --s_d {input.sample_description} --threads {threads} --index {index} --transcripts_to_genes {transcripts_to_genes} --white_10xv2 {params.white_10xv2} --white_10xv3 {params.white_10xv3}"
+    params: white_10xv1="{{ white_10xv1 }}", white_10xv2="{{ white_10xv2 }}",
+            white_10xv3="{{ white_10xv3 }}", threads = {{ KallistoThreads }}
+    shell:
+        """
+        python scripts/define_version.py --s_d {input.s_d} --tmp_bam {input.bams[0]} \
+        --threads {params.threads} --index {index} --transcripts_to_genes {transcripts_to_genes} \
+        --white_10xv1 {params.white_10xv1} --white_10xv2 {params.white_10xv2} --white_10xv3 {params.white_10xv3}
+        """
+
 {% elif cell_ranger and not bam and fq_dump %}
 
 rule define_version:
@@ -58,12 +67,12 @@ rule define_version:
     log: fq_dump="logs/fq_dump/{accession}_dump.log"
     conda: "{{ PathToCondaYml }}"
     params: run_id=lambda wildcards: wildcards.accession,
-            white_10xv2="{{ white_10xv2 }}", white_10xv3="{{ white_10xv3 }}"
+            white_10xv2="{{ white_10xv2 }}", white_10xv3="{{ white_10xv3 }}", max_size='50G'
     threads: {{ KallistoThreads }}
     shell:
          """
          python scripts/define_version.py --sra_file {input} --threads {threads} --index {index} --transcripts_to_genes {transcripts_to_genes} --white_10xv2 {params.white_10xv2} --white_10xv3 {params.white_10xv3}
-         prefetch {params.run_id} -o {output.sra} --max-size 50G
+         prefetch {params.run_id} -o {output.sra} --max-size {params.max_size}
          parallel-fastq-dump -s {output.sra} --split-files --threads {threads} -O . --tmpdir . --gzip
          """
 
