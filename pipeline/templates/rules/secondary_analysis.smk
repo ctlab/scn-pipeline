@@ -15,4 +15,4 @@ rule run_analysis:
     log: "logs/seurat.log"
     conda: "{{ PathToCondaYml }}"
     singularity: "{{ PathToSinImage }}"
-    shell: "Rscript scripts/analysis.R 2> {log}"
+    shell: "Rscript scripts/analysis.R"

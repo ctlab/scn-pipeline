@@ -54,9 +54,9 @@ PathToSingularityDir: /mnt/tank/scratch/mfiruleva/scn/config
 
 ## Variables related to conda settings
 
-PathToCondaYml: /mnt/tank/scratch/mfiruleva/scn/config/5d179225.yaml
+PathToCondaYml: /mnt/tank/scratch/mfiruleva/scn/config/65ef9760.yaml
 PathToCondaDir: /mnt/tank/scratch/mfiruleva/scn/config
-CondaFull: /mnt/tank/scratch/mfiruleva/scn/config/5d179225
+CondaFull: /mnt/tank/scratch/mfiruleva/scn/config/65ef9760
 
 ## Variables related to task manager
 Threads: 4
