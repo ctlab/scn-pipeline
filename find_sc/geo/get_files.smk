@@ -9,7 +9,7 @@ rule get_files:
     output: file_study="out/{sp}_study.tsv",
             file_sample="out/{sp}_sample.tsv",
             sample_meta="out/{sp}_sample_annotated.tsv"
-    conda: "find_sc.yml"
+    conda: "../find_sc.yml"
     benchmark: "benchmarks/get_files/{sp}.txt"
     params: sp_name=lambda wildcards: wildcards.sp, start_date="2019/12/02", end_date="2019/12/02"
     log: "logs/get_files/{sp}.txt"
