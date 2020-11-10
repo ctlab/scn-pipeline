@@ -12,7 +12,7 @@ All dependencies are listed in the *../find_sc.yml* file.
 ## Run pipeline
 
 ```
-snakemake -j 1 --use-conda --conda-prefix $(pwd) --config start_date=2020-10-01 end_date=2020-10-15
+snakemake -j 1 --use-conda --conda-prefix $(pwd) --config start_date=2020.10.01 end_date=2020.10.15
 ```
 
 ## Results

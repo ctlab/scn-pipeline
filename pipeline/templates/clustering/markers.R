@@ -1,6 +1,9 @@
 
 analyze_object <- function(object, ident) {
   Idents(object) <- object[[ident]]
+  if (length(levels(object)) == 1) {
+    return(message(sprintf('%s: since only one cluster was identified, markers can not be found', ident)))
+  }
   out_dir <- paste0('markers/', ident)
   dir.create(out_dir, recursive = T)
   whole.markers <- FindAllMarkers(object = object,

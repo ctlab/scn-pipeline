@@ -4,6 +4,7 @@
 rule get_bam_header:
     output: temp("{accession}_tmp.bam")
     conda: "{{ PathToCondaYml }}"
+    singularity: "{{ PathToSinImage }}"
     log: "logs/get_bam_{accession}.log"
     benchmark: "benchmarks/get_bam_{accession}.txt"
     params: link=lambda wildcards, output: bam_files[f'{wildcards.accession}']
@@ -91,7 +92,8 @@ rule fastq_dump:
     threads: 1
     shell:
          """
-         esearch -db sra -query {params.run_id} | efetch -format metadata | grep -Po 'average="(\d+)"' | awk '!x[$0]++' | sed 's/average=//g' | sed 's/"//g' > {params.run_id}_sra.txt
+         esearch -db sra -query {params.run_id} | efetch -format metadata | \
+         grep -Po 'average="(\d+)"' | awk '!x[$0]++' | sed 's/average=//g' | sed 's/"//g' > {params.run_id}_sra.txt
          """
 
 {% elif not cell_ranger and not bam and not fq_dump %}

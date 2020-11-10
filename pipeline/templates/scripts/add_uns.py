@@ -1,4 +1,5 @@
 import argparse
+import os.path
 import re
 from urllib.request import urlopen, Request
 from xml.etree.ElementTree import parse
@@ -94,9 +95,11 @@ def add_uns(h5: str, h5_out: str, s_d: str, summary_file: str, kallisto_script=N
     resolutions = re.sub('\s', '', "{{ Clustering.GraphBased.Resolution }}").split(',')
     for res in resolutions:
 {% if AnalysisType == 'single' %}
-        file.uns['markers'][f'markers{res}'] = get_markers(f'markers/SCT_snn_res.{res}/markers.tsv')
+        if os.path.exists(f'markers/SCT_snn_res.{res}/markers.tsv'):
+            file.uns['markers'][f'markers{res}'] = get_markers(f'markers/SCT_snn_res.{res}/markers.tsv')
 {% else %}
-        file.uns['markers'][f'markers{res}'] = get_markers(f'markers/integrated_snn_res.{res}/markers.tsv')
+        if os.path.exists(f'markers/integrated_snn_res.{res}/markers.tsv'):
+            file.uns['markers'][f'markers{res}'] = get_markers(f'markers/integrated_snn_res.{res}/markers.tsv')
 {% endif %}
 
     file.write_h5ad(h5_out, compression='gzip')
@@ -137,9 +140,11 @@ def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str, summary_file: 
     resolutions = re.sub('\s', '', "{{ Clustering.GraphBased.Resolution }}").split(',')
     for res in resolutions:
 {% if AnalysisType == 'single' %}
-        file.uns['markers'][f'markers{res}'] = get_markers(f'markers/SCT_snn_res.{res}/markers.tsv')
+        if os.path.exists(f'markers/SCT_snn_res.{res}/markers.tsv'):
+            file.uns['markers'][f'markers{res}'] = get_markers(f'markers/SCT_snn_res.{res}/markers.tsv')
 {% else %}
-        file.uns['markers'][f'markers{res}'] = get_markers(f'markers/integrated_snn_res.{res}/markers.tsv')
+        if os.path.exists(f'markers/integrated_snn_res.{res}/markers.tsv'):
+            file.uns['markers'][f'markers{res}'] = get_markers(f'markers/integrated_snn_res.{res}/markers.tsv')
 {% endif %}
 
 
