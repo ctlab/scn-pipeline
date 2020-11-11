@@ -62,18 +62,20 @@ rule define_version:
 {% elif cell_ranger and not bam and fq_dump %}
 
 rule define_version:
-    input: "{accession}_sra.txt"
-    output: temp("{accession}_1.fastq.gz"), temp("{accession}_2.fastq.gz"), sra=temp("sra/{accession}.sra")
+    input: sra_file=rules.fastq_dump.output.sra_file, tmp_fq=rules.fastq_dump.output.tmp_fq
+    output: sra=temp("sra/{accession}.sra"), fq_dir=temp(directory('fq_dir/{accession}'))
     log: fq_dump="logs/fq_dump/{accession}_dump.log"
     conda: "{{ PathToCondaYml }}"
-    params: run_id=lambda wildcards: wildcards.accession,
+    params: run_id=lambda wildcards: wildcards.accession, fq_dir='fq_dir',
             white_10xv2="{{ white_10xv2 }}", white_10xv3="{{ white_10xv3 }}", max_size='50G'
     threads: {{ KallistoThreads }}
     shell:
          """
-         python scripts/define_version.py --sra_file {input} --threads {threads} --index {index} --transcripts_to_genes {transcripts_to_genes} --white_10xv2 {params.white_10xv2} --white_10xv3 {params.white_10xv3}
+         python scripts/define_version.py --sra_file {input.sra_file} --threads {threads} --index {index} \
+         --transcripts_to_genes {transcripts_to_genes} --white_10xv2 {params.white_10xv2} \
+         --white_10xv3 {params.white_10xv3} --tmp_fq {input.tmp_fq} --fq_dir {params.fq_dir}
          prefetch {params.run_id} -o {output.sra} --max-size {params.max_size}
-         parallel-fastq-dump -s {output.sra} --split-files --threads {threads} -O . --tmpdir . --gzip
+         parallel-fastq-dump -s {output.sra} --split-files --threads {threads} -O {output.fq_dir} --tmpdir . --gzip
          """
 
 {% endif %}

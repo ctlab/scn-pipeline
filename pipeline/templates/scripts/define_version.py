@@ -88,13 +88,16 @@ if __name__ == '__main__':
 
 {% elif not bam and fq_dump and cell_ranger %}
 
+import glob
 import subprocess
+
+from itertools import product
 
 read_info = dict()
 read_info['technology'] = 'NA'
 
 
-def def_type(read_len: int, postfix: str, whitelist_10xv2: str, whitelist_10xv3: str) -> None:
+def def_type(read_len: int, postfix: int, whitelist_10xv2: str, whitelist_10xv3: str) -> None:
     if read_len < 12:
         read_info['index'] = postfix
     if read_len == 26:
@@ -110,9 +113,53 @@ def def_type(read_len: int, postfix: str, whitelist_10xv2: str, whitelist_10xv3:
     if read_len > 50:
         read_info['bio'] = postfix
 
+def match_barcodes(white_list: str, read_file: str) -> float:
+    """
+    Find match percentage of sliced bp seq from reads and barcodes from whitelist
+    :param white_list: path to whitelist file
+    :param read_file: path to unzipped fq file (only header)
+    :return:
+    """
+    barcodes = set(line.strip() for line in open(white_list))
+    with open(read_file, 'r') as file:
+        count = 0
+        for idx, line in enumerate(file, start=1):
+            if idx and not idx % 2 and idx % 4:
+                if line[0:16] in barcodes:
+                    count += 1
+    return 100 * (count / idx)
 
-def get_info(sra_file, threads: int, index: str, transcripts_to_genes: str,
-             whitelist_10xv2: str, whitelist_10xv3: str, kallisto_script='kallisto.sh') -> None:
+def get_read_info(sra_file: str, whitelist_10xv2: str, whitelist_10xv3: str, fq_dir: str) -> None:
+    """
+    Define 10x version: find matches between 10x barcodes and reads[0:16] header for each fq read for certain SRR
+    from fq header (timeout 30s fastq-dump, see rule fastq_dump)
+    If more than 20% of sequences were matched to the certain whitelist, pipeline will use corresponding
+    technology in downstream analysis
+    :param sra_file: path to sra file
+    :param whitelist_10xv2: path to 10xv2 whitelist
+    :param whitelist_10xv3: path to 10xv3 whitelist
+    :param fq_dir: path to dir with fq headers
+    :return: None
+    """
+    lengths = dict()
+    with open(sra_file) as file:
+        for idx, line in enumerate(file):
+            lengths[idx + 1] = int(float(line.strip()))
+    whitelists = [whitelist_10xv2, whitelist_10xv3]
+    reads = sorted(glob.glob(f'{fq_dir}/*'))
+    res = {pair: match_barcodes(pair[0], pair[1]) for pair in product(whitelists, reads)}
+    if max(res.values()) > 20:
+        read_info['technology'] = re.findall('10xv\d', max(res, key=res.get)[0])[0]
+        read_info['barcode'] = re.sub('_', '', re.findall('_\d', max(res, key=res.get)[1])[0])
+        read_info['whitelist'] = max(res, key=res.get)[0]
+        if len(lengths.keys()) == 2:
+            read_info['bio'] = list(filter(lambda x: x != read_info['barcode'], ['1', '2']))[0]
+        else:
+            filtered_files = {k: v for k, v in lengths.items() if str(k) != read_info['barcode']}
+            read_info['bio'] = max(filtered_files, key=filtered_files.get)
+
+def get_info(sra_file, threads: int, index: str, transcripts_to_genes: str, whitelist_10xv2: str,
+             whitelist_10xv3: str, tmp_fq: str, fq_dir: str, kallisto_script='kallisto.sh') -> None:
     number_of_files = int(subprocess.getoutput(f"wc -l {sra_file}")[0])
     sra = pd.read_csv(f'{sra_file}', names=['length']).transpose()
     sra.columns = range(1, number_of_files + 1)
@@ -120,11 +167,13 @@ def get_info(sra_file, threads: int, index: str, transcripts_to_genes: str,
         def_type(sra[postfix][0], postfix=postfix, whitelist_10xv2=whitelist_10xv2,
                  whitelist_10xv3=whitelist_10xv3)
     if read_info['technology'] == 'NA':
+        get_read_info(sra_file, whitelist_10xv2, whitelist_10xv3, tmp_fq)
+    if read_info['technology'] == 'NA':
         raise Exception("Technology wasn't defined")
     with open(kallisto_script, 'w') as out_file:
         out_file.write("mkfifo R1.gz R2.gz\n")
-        out_file.write(f"cat *{read_info['barcode']}.fastq.gz > R1.gz &\n")
-        out_file.write(f"cat *{read_info['bio']}.fastq.gz > R2.gz &\n")
+        out_file.write(f"cat {fq_dir}/*/*{read_info['barcode']}.fastq.gz > R1.gz &\n")
+        out_file.write(f"cat {fq_dir}/*/*{read_info['bio']}.fastq.gz > R2.gz &\n")
         out_file.write(
             f'kallisto bus -i {index} -x {read_info["technology"]} -t {threads} -o bus_out/ R1.gz R2.gz \n')
         out_file.write('mkdir bus_out/tmp\n')
@@ -148,9 +197,13 @@ if __name__ == '__main__':
                         help='Path to whitelist for 10xv2')
     parser.add_argument('--white_10xv3', type=str, required=True,
                         help='Path to whitelist for 10xv3')
+    parser.add_argument('--tmp_fq', type=str, required=True,
+                        help='Path to temporary fq directory with fq headers')
+    parser.add_argument('--fq_dir', type=str, required=True,
+                        help='Path to directory with fq files')
     args = parser.parse_args()
     get_info(args.sra_file, args.threads, args.index, args.transcripts_to_genes, args.white_10xv2,
-             args.white_10xv3)
+             args.white_10xv3, args.tmp_fq, args.fq_dir)
 
 {% elif bam and not fq_dump %}
 

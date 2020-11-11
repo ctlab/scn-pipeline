@@ -86,14 +86,14 @@ rule download_the_beginning_of_bam:
 {% elif cell_ranger and not bam and fq_dump %}
 
 rule fastq_dump:
-    output: "{accession}_sra.txt"
+    output: sra_file="{accession}_sra.txt", tmp_fq=temp(directory('{accession}_tmp'))
     params: run_id=lambda wildcards: wildcards.accession
     conda: "{{ PathToCondaYml }}"
     threads: 1
     shell:
          """
-         esearch -db sra -query {params.run_id} | efetch -format metadata | \
-         grep -Po 'average="(\d+)"' | awk '!x[$0]++' | sed 's/average=//g' | sed 's/"//g' > {params.run_id}_sra.txt
+         timeout 20s fastq-dump --outdir {output.tmp_fq} --split-files {params.run_id} || true
+         esearch -db sra -query {params.run_id} | efetch -format metadata | grep -Po 'average="\K.*?(?=")' | head -$(ls {output.tmp_fq} | wc -l) > {params.run_id}_sra.txt
          """
 
 {% elif not cell_ranger and not bam and not fq_dump %}
