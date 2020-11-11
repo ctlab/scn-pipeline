@@ -2,11 +2,11 @@ RunName: GSE142345
 Organism:
 - Mus musculus
 Objects:
-- GSE142345/SRS5863537/counts.RData
+- /mnt/space/work/GSE142345/SRS5863537/counts.RData
 SampleIds:
 - SRS5863537
 PathsToCounts: no
-PathToAnalysis: GSE157771
+PathToAnalysis: /mnt/space/work/GSE142345
 db: GEO
 bam: no
 fq_dump: yes

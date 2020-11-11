@@ -1,8 +1,8 @@
 job("Test single, merge and bulk-like modes using prepared public available data") {
     parallel {
         container("continuumio/miniconda3") {
-            shellScript {
             workDir = "/mnt/space/work/pipeline"
+            shellScript {
                 content = """
                 conda env update -n base --file /mnt/space/work/scn.yml
                 wget https://www.dropbox.com/s/3aa6x4jk0odfg6u/945396_mm.GRCm38.cdna.all.idx?dl=1 -O /mnt/space/work/945396_mm.GRCm38.cdna.all.idx
@@ -17,8 +17,8 @@ job("Test single, merge and bulk-like modes using prepared public available data
             }
         }
         container("continuumio/miniconda3") {
-            shellScript {
             workDir = "/mnt/space/work/pipeline"
+            shellScript {
                 content = """
                 conda env update -n base --file /mnt/space/work/scn.yml
                 python generate.py --yaml_path example/merge
@@ -29,8 +29,8 @@ job("Test single, merge and bulk-like modes using prepared public available data
             }
         }
         container("continuumio/miniconda3") {
-            shellScript {
             workDir = "/mnt/space/work/pipeline"
+            shellScript {
                 content = """
                 conda env update -n base --file /mnt/space/work/scn.yml
                 wget https://www.dropbox.com/s/3aa6x4jk0odfg6u/945396_mm.GRCm38.cdna.all.idx?dl=1 -O /mnt/space/work/945396_mm.GRCm38.cdna.all.idx
@@ -42,8 +42,8 @@ job("Test single, merge and bulk-like modes using prepared public available data
             }
         }
         container("continuumio/miniconda3") {
-            shellScript {
             workDir = "/mnt/space/work/pipeline"
+            shellScript {
                 content = """
                 conda env update -n base --file /mnt/space/work/scn.yml
                 wget https://www.dropbox.com/s/3aa6x4jk0odfg6u/945396_mm.GRCm38.cdna.all.idx?dl=1 -O /mnt/space/work/945396_mm.GRCm38.cdna.all.idx
@@ -61,8 +61,8 @@ job("Test single, merge and bulk-like modes using prepared public available data
 }
 job("Test panglao mode using SRS1876792 as example dataset") {
     container("continuumio/miniconda3") {
-        shellScript {
         workDir = "/mnt/space/work/pipeline"
+        shellScript {
             content = """
             conda env update -n base --file /mnt/space/work/scn.yml
             python generate.py --yaml_path example/single/panglao
