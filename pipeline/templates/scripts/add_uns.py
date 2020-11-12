@@ -114,24 +114,34 @@ def extract_description(MTAB_ID: str) -> str:
     tab_content = tab_content.decode('latin-1')
     return tab_content
 
-def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str, summary_file: str) -> None:
-    description = pd.read_csv(s_d).reset_index().to_dict("records")[0]
+def add_uns(h5: str, h5_out: str, s_d: str, summary_file: str, kallisto_script=None, technology=None) -> None:
+    description = pd.read_csv(s_d).to_dict("records")[0]
     file = scanpy.read_h5ad(h5)
     file.uns["expType"] = "counts"
     file.uns["public"] = True
     file.uns["curated"] = False
-    file.uns["mtab_id"] = description['mtab']
-    file.uns["mtab_url"] = f"https://www.ebi.ac.uk/arrayexpress/experiments/{description['mtab']}"
+    file.uns["mtab_id"] = description['MTAB']
+    file.uns["mtab_url"] = f"https://www.ebi.ac.uk/arrayexpress/experiments/{description['MTAB']}"
     file.uns["token"] = description['biosd_sample']
-    file.uns["species"] = description['organism'][0]
+    file.uns["species"] = description['organism']
     if description['technology'] != "10x":
         file.uns["technology"] = description['technology']
     else:
         with open(kallisto_script, 'r') as run_file:
             data = run_file.read().replace('\n', '')
-        file.uns["technology"] = re.findall('10xv[0-9]*', data)[0]
+        file.uns["technology"] = re.findall('10xv[1-3]*', data)[0]
 
-    brief = extract_description(description['mtab'])
+    brief = extract_description(description['MTAB'])
+
+    {% if AnalysisType == 'single' %}
+
+    file.uns["token"] = description['biosd_sample']
+
+    {% elif AnalysisType == 'many' %}
+
+    file.uns["token"] = description['MTAB']
+
+    {% endif %}
 
     file.uns["title"] = re.sub('.*Title[\s]*', '', re.findall(r"Investigation Title.*\n", brief)[0])
     file.uns["description"] = re.sub('Experiment Description[\s]*', '', re.findall(r"Experiment Description.*\n", brief)[0])
@@ -148,8 +158,8 @@ def add_uns(h5: str, h5_out: str, kallisto_script: str, s_d: str, summary_file: 
 {% endif %}
 
 
-    meta = {'dataset': file.uns['gse'], 'sample': file.uns['token'], 'organism': file.uns['species'][0],
-            'technology': file.uns['technology'][0], 'path': path}
+    meta = {'dataset': file.uns['mtab_id'], 'sample': file.uns['token'], 'organism': file.uns['species'][0],
+            'technology': file.uns['technology'], 'path': path}
     pd.DataFrame.from_dict(meta, orient='index').T.to_csv(summary_file, mode='a', header=False, index=False)
 
     file.write_h5ad(h5_out, compression='gzip')

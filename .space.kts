@@ -72,3 +72,22 @@ job("Test panglao mode using SRS1876792 as example dataset") {
         }
     }
 }
+
+job("test array-express sample: use ERR3601423 as an example") {
+    container("continuumio/miniconda3") {
+        workDir = "/mnt/space/work/pipeline"
+        shellScript {
+            content = """
+            conda env update -n base --file /mnt/space/work/scn.yml
+            wget https://www.dropbox.com/s/3aa6x4jk0odfg6u/945396_mm.GRCm38.cdna.all.idx?dl=1 -O /mnt/space/work/945396_mm.GRCm38.cdna.all.idx
+            wget https://www.dropbox.com/s/zsbrkioi7nocyrl/10xv1_whitelist.txt?dl=1 -O /mnt/space/work/10xv1_whitelist.txt
+            wget https://www.dropbox.com/s/ptuhp5qlfs8pfro/10xv2_whitelist.txt?dl=1 -O /mnt/space/work/10xv2_whitelist.txt
+            wget https://www.dropbox.com/s/xcxbnvhwfr6b02g/10xv3_whitelist.txt?dl=1 -O /mnt/space/work/10xv3_whitelist.txt
+            wget https://www.dropbox.com/s/nacb098h1ubbekw/transcripts_to_genes_v2.txt?dl=1 -O /mnt/space/work/transcripts_to_genes_v2.txt
+            python generate.py --yaml_path example/single/array_express
+            mv example/single/array_express/sample_description.csv /mnt/space/work/E-MTAB-8445/SAMEA6096700
+            bash /mnt/space/work/E-MTAB-8445/SAMEA6096700/task.bash
+            """
+        }
+    }
+}

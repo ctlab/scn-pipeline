@@ -47,11 +47,7 @@ createSeurat <- function(counts) {
       FDR = NULL
     )
   data <- data[, e.out$is_cell]
-{% if db == 'GEO' %}
-  obj <- CreateSeuratObject(data, min.cells = 3, project = paste(gsub("^.*?SRS","SRS", getwd())))
-{% elif db == 'MTAB' %}
-  obj <- CreateSeuratObject(data, min.cells = 3, project = paste(gsub("^.*?SAMEA","SAMEA", getwd())))
-{% endif %}
+  obj <- CreateSeuratObject(data, min.cells = 3, project = "{{ SampleId }}")
   obj
 }
 

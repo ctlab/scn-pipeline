@@ -1,0 +1,2 @@
+,MTAB,organism,bam,biosd_sample,ena_sample,ena_run,fastq_1,fastq_2,fastq_3,technology
+1,E-MTAB-8445,Mus musculus,ftp://ftp.sra.ebi.ac.uk/vol1/run/ERR360/ERR3601423/Naive_RFP_1_S1_L001.bam,SAMEA6096700,ERS3897094,ERR3601423,ftp.ebi.ac.uk/pub/databases/microarray/data/experiment/MTAB/E-MTAB-8445/Naive_RFP_1_S1_L001_R1_001.fastq.gz,ftp.ebi.ac.uk/pub/databases/microarray/data/experiment/MTAB/E-MTAB-8445/Naive_RFP_1_S1_L001_R2_001.fastq.gz,ftp://ftp.ebi.ac.uk/pub/databases/microarray/data/experiment/MTAB/E-MTAB-8445/Naive_RFP_1_S1_L001_I1_001.fastq.gz,10x

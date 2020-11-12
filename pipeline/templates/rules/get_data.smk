@@ -10,12 +10,11 @@ rule get_bam_header:
     params: link=lambda wildcards, output: bam_files[f'{wildcards.accession}']
     shell: "wget -q -O - {params.link} | head -1000 > {output} || true"
 
-{% elif cell_ranger and not bam and db == 'GEO' and not fq_dump %}
+{% elif cell_ranger and not bam and not fq_dump %}
 
-rule download_fq_header:
+rule get_fq_header:
     """
-    Download the first read for forward fastq file
-    and gzipped it in to R1.gz file. Pipeline uses this file for definition of 10x version:
+    Download the first 400000 lines of R1.fastq.gz file. Pipeline uses these lines for 10x version definition.
     """
     output: temp("{accession}_1.fastq.gz")
     conda: "{{ PathToCondaYml }}"
@@ -27,42 +26,10 @@ shell: "wget -q -O - ftp://{params.link}| zcat | head -400000 | gzip > {output} 
     {% elif test_mode %}
 shell: "wget -q -O - {params.link}| zcat | head -400000 | gzip > {output} || true"
     {% endif %}
-{% elif cell_ranger and not bam and db == 'MTAB' and not fq_dump %}
-
-rule prepare_loading: #todo prepare_loading + down_beg_of_fq -> one rule
-    """
-    Download the first read for forward fastq file
-    and gzipped it in to R1.gz file. Pipeline uses this file for definition of 10x version:
-    """
-    input: s_d="sample_description.csv"
-    output: download_script="download_the_beginning_of_fqs.sh"
-    run:
-        import pandas as pd
-
-        assert 'R1' in read_types.values() and 'R2' in read_types.values(), 'There are no R1 and / or R2 in given sample description'
-        with open(output.download_script, 'w') as out_file:
-            description = pd.read_csv(input.s_d).reset_index().to_dict("records")
-            out_file.write(f"wget -q -O - {description[0][list(read_types.keys())[list(read_types.values()).index('R1')]]} | zcat | head -400000 | gzip > R1.gz\n")
-
-rule download_the_beginning_of_fastqs:
-    input: rules.prepare_loading.output
-    output: "R1.gz"
-    conda: "{{ PathToCondaYml }}"
-    log: "logs/download_the_beginning_of_fqs.log"
-    benchmark: "benchmarks/download_the_beginning_of_fqs.txt"
-    run: shell("""
-        set +o pipefail
-        chmod +x  download_the_beginning_of_fqs.sh
-        ./download_the_beginning_of_fqs.sh || true""")
 
 {% elif cell_ranger and bam and db == 'MTAB' and not fq_dump %}
 
 rule prepare_loading:
-    """
-    Download the first ~1000 lines from bam file.
-    Pipeline uses this file for definition of 10x version:
-    """
-    input: "sample_description.csv"
     output: kallisto_script="download_the_beginning_of_bam.sh"
     conda: "{{ PathToCondaYml }}"
     log: "logs/prepare_loading.log"

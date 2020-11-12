@@ -4,8 +4,10 @@ import pandas as pd
 description = pd.read_csv('sample_description.csv').reset_index().to_dict("records")
 {% endif %}
 
-{% if AnalysisType == "single" and cell_ranger and not fq_dump and not bam and not panglao %}
+{% if AnalysisType == "single" and cell_ranger and not fq_dump and not bam and not panglao and db == 'GEO' %}
 barcodes =  {x['run_accession']: x['fastq_ftp'].split(';')[0] for x in description}
+{% elif AnalysisType == "single" and cell_ranger and not fq_dump and not bam and not panglao and db == 'MTAB' %}
+barcodes =  {x['ena_run']: x['fastq_1'] for x in description}
 {% elif AnalysisType == "single" and cell_ranger and not fq_dump and bam and not panglao %}
 bam_files = {run['run_accession']: f"ftp://{run['submitted_ftp'].split(';')[0]}" for run in description}
 {% elif AnalysisType == "single" and cell_ranger and fq_dump and not panglao %}

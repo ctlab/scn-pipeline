@@ -42,8 +42,18 @@ def tech_version(fq_r1: str, whielist_10xv2: str, whielist_10xv3: str) -> dict:
 def get_info(fq_r1: str, threads: int, index: str, transcripts_to_genes: str,
              whielist_10xv2: str, whielist_10xv3: str, kallisto_script='kallisto.sh'):
     description = pd.read_csv('sample_description.csv').reset_index().to_dict("records")
+    {% if db == 'GEO' %}
+
     r1 = [re.sub('ftp://', '', x['fastq_ftp'].split(';')[0]) for x in description]
     r2 = [re.sub('ftp://', '', x['fastq_ftp'].split(';')[1]) for x in description]
+
+    {% elif db == 'MTAB' %}
+
+    r1 = [x['fastq_1'] for x in description]
+    r2 = [x['fastq_2'] for x in description]
+
+    {% endif %}
+
     read_info = tech_version(fq_r1, whielist_10xv2, whielist_10xv3)
     if read_info['technology'] == 'NA':
         raise Exception("Technology wasn't defined")
@@ -123,17 +133,19 @@ def match_barcodes(white_list: str, read_file: str) -> float:
     barcodes = set(line.strip() for line in open(white_list))
     with open(read_file, 'r') as file:
         count = 0
+        no_of_seqs = 0
         for idx, line in enumerate(file, start=1):
             if idx and not idx % 2 and idx % 4:
+                no_of_seqs += 1
                 if line[0:16] in barcodes:
                     count += 1
-    return 100 * (count / idx)
+    return 100 * (count / no_of_seqs)
 
 def get_read_info(sra_file: str, whitelist_10xv2: str, whitelist_10xv3: str, fq_dir: str) -> None:
     """
     Define 10x version: find matches between 10x barcodes and reads[0:16] header for each fq read for certain SRR
     from fq header (timeout 30s fastq-dump, see rule fastq_dump)
-    If more than 20% of sequences were matched to the certain whitelist, pipeline will use corresponding
+    If more than 95% of sequences were matched to the certain whitelist, pipeline will use corresponding
     technology in downstream analysis
     :param sra_file: path to sra file
     :param whitelist_10xv2: path to 10xv2 whitelist
@@ -148,15 +160,12 @@ def get_read_info(sra_file: str, whitelist_10xv2: str, whitelist_10xv3: str, fq_
     whitelists = [whitelist_10xv2, whitelist_10xv3]
     reads = sorted(glob.glob(f'{fq_dir}/*'))
     res = {pair: match_barcodes(pair[0], pair[1]) for pair in product(whitelists, reads)}
-    if max(res.values()) > 20:
+    if max(res.values()) > 95:
         read_info['technology'] = re.findall('10xv\d', max(res, key=res.get)[0])[0]
         read_info['barcode'] = re.sub('_', '', re.findall('_\d', max(res, key=res.get)[1])[0])
         read_info['whitelist'] = max(res, key=res.get)[0]
-        if len(lengths.keys()) == 2:
-            read_info['bio'] = list(filter(lambda x: x != read_info['barcode'], ['1', '2']))[0]
-        else:
-            filtered_files = {k: v for k, v in lengths.items() if str(k) != read_info['barcode']}
-            read_info['bio'] = max(filtered_files, key=filtered_files.get)
+        other_files = {k: v for k, v in lengths.items() if str(k) != read_info['barcode']}
+        read_info['bio'] = max(other_files, key=other_files.get)
 
 def get_info(sra_file, threads: int, index: str, transcripts_to_genes: str, whitelist_10xv2: str,
              whitelist_10xv3: str, tmp_fq: str, fq_dir: str, kallisto_script='kallisto.sh') -> None:
