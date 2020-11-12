@@ -115,8 +115,11 @@ def extract_description(MTAB_ID: str) -> str:
     return tab_content
 
 def add_uns(h5: str, h5_out: str, s_d: str, summary_file: str, kallisto_script=None, technology=None) -> None:
-    description = pd.read_csv(s_d).to_dict("records")[0]
     file = scanpy.read_h5ad(h5)
+
+    {% if not test_mode %}
+
+    description = pd.read_csv(s_d).to_dict("records")[0]
     file.uns["expType"] = "counts"
     file.uns["public"] = True
     file.uns["curated"] = False
@@ -146,6 +149,9 @@ def add_uns(h5: str, h5_out: str, s_d: str, summary_file: str, kallisto_script=N
     file.uns["title"] = re.sub('.*Title[\s]*', '', re.findall(r"Investigation Title.*\n", brief)[0])
     file.uns["description"] = re.sub('Experiment Description[\s]*', '', re.findall(r"Experiment Description.*\n", brief)[0])
     file.uns["design"] = re.sub('Protocol Description[\s]*', '', re.findall(r"Protocol Description.*\n", brief)[0])
+
+    {% endif %}
+
     file.uns['markers'] = dict()
     resolutions = re.sub('\s', '', "{{ Clustering.GraphBased.Resolution }}").split(',')
     for res in resolutions:
