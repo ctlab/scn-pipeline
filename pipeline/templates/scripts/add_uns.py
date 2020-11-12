@@ -150,6 +150,10 @@ def add_uns(h5: str, h5_out: str, s_d: str, summary_file: str, kallisto_script=N
     file.uns["description"] = re.sub('Experiment Description[\s]*', '', re.findall(r"Experiment Description.*\n", brief)[0])
     file.uns["design"] = re.sub('Protocol Description[\s]*', '', re.findall(r"Protocol Description.*\n", brief)[0])
 
+    meta = {'dataset': file.uns['mtab_id'], 'sample': file.uns['token'], 'organism': file.uns['species'],
+            'technology': file.uns['technology'], 'path': path}
+    pd.DataFrame.from_dict(meta, orient='index').T.to_csv(summary_file, mode='a', header=False, index=False)
+
     {% endif %}
 
     file.uns['markers'] = dict()
@@ -163,10 +167,6 @@ def add_uns(h5: str, h5_out: str, s_d: str, summary_file: str, kallisto_script=N
             file.uns['markers'][f'markers{res}'] = get_markers(f'markers/integrated_snn_res.{res}/markers.tsv')
 {% endif %}
 
-
-    meta = {'dataset': file.uns['mtab_id'], 'sample': file.uns['token'], 'organism': file.uns['species'][0],
-            'technology': file.uns['technology'], 'path': path}
-    pd.DataFrame.from_dict(meta, orient='index').T.to_csv(summary_file, mode='a', header=False, index=False)
 
     file.write_h5ad(h5_out, compression='gzip')
 
