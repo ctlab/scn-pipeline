@@ -1,5 +1,6 @@
 import json
 from DefineVersionTenX import prepare_files_10x
+from DefineVersionDropseq import prepare_files_dropseq
 from DefineTechnologyUtils import *
 
 SPECIES = {
@@ -48,11 +49,25 @@ with open(snakemake.input["ffq_json"], "r") as in_file:
                             srr_run["whitelist"] = whitelists[version]
                             srr_run["files"] = files
 
+                        elif technology == Constants.TECH_DROPSEQ:
+                            files, processing_type, version = prepare_files_dropseq(
+                                srr_accession=srr_accession,
+                                files=srr_run["files"],
+                                ncbi_dir=snakemake.params["ncbi_dir"],
+                                header_dir=snakemake.params["header_dir"],
+                                threads=snakemake.threads,
+                            )
+
+                            if version == -1:
+                                raise Exception(f"Could not identify version for {srr_accession}")
+
+                            srr_run["processing_type"] = processing_type
+                            srr_run["version"] = version
+                            srr_run["files"] = files
+
                         else:
                             raise Exception(f"Technology {technology} is yet unsupported for {srr_accession}")
 
-                        # elif technology == Constants.TECH_DROPSEQ:
-                        #     pass
 
     with open(snakemake.output["ffq_full"], "w") as out_file:
         json.dump(datasets, out_file)

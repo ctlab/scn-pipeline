@@ -23,3 +23,22 @@ STAR --genomeDir $index_dir \
     {% endif %}
   {% endif %}
 {% endif %}
+
+{% if technology == "DROPSEQ" %}
+  {% if processing_mode == "fastq" or processing_mode == "fastq_dump" %}
+
+STAR --genomeDir $index_dir \
+  --readFilesIn {{ cdna|join(",") }} {{ barcode|join(",") }} \
+  --clipAdapterType CellRanger4 --outFilterScoreMin 30 \
+  --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR --soloUMIdedup 1MM_CR \
+  --soloCBstart 1 --soloCBlen 12 --soloUMIstart 13 --soloUMIlen 8 \
+  --soloBarcodeReadLength 0 \
+  --soloType CB_UMI_Simple \
+  --soloCBwhitelist {{ whitelist }} \
+  --outFileNamePrefix {{ out_dir }} \
+  --runThreadN {{ threads }} \
+  --readFilesCommand zcat \
+  --outSAMtype BAM Unsorted
+
+  {% endif %}
+{% endif %}
