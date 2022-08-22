@@ -6,7 +6,7 @@ import os
 min_version("7.0")
 configfile: "configs/config.yaml"
 
-config["datasets"] = config.get("templates", os.path.join(os.getcwd(), "config", "datasets.json"))
+config["datasets"] = config.get("templates", os.path.join(os.getcwd(), "configs", "datasets.json"))
 config["samples"] = config.get("samples", os.path.join(config["out_dir"], "meta", "sample_description.json"))
 config["templates"] = config.get("templates", os.path.join(os.getcwd(), "workflow", "templates"))
 config["resources"] = config.get("resources", os.path.join(config["out_dir"], "resources"))
