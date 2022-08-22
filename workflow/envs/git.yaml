@@ -1,0 +1,7 @@
+name: git
+
+channels:
+  - anaconda
+
+dependencies:
+  - anaconda::git=2.34.1

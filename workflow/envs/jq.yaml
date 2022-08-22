@@ -1,0 +1,6 @@
+name: jq
+channels:
+ - conda-forge
+dependencies:
+ - python=3.9
+ - conda-forge::jq=1.6

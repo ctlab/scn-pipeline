@@ -1,0 +1,8 @@
+name: entrez-direct-utils
+channels:
+ - bioconda
+ - conda-forge
+dependencies:
+ - entrez-direct=16.2
+ - sra-tools=2.11.0
+ - parallel-fastq-dump=0.6.7

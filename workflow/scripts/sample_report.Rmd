@@ -1,0 +1,135 @@
+---
+title: "Auto-generated report for sample"
+date: "`r format(Sys.time(), '%R %Y/%m/%d')`"
+params:
+   rmd: "report.Rmd"
+output:
+  html_document:
+  highlight: tango
+  number_sections: no
+  theme: default
+  toc: yes
+  toc_depth: 3
+  toc_float:
+    collapsed: no
+    smooth_scroll: yes
+---
+
+
+# `r snakemake@params$sample`
+
+```{r prep, warning=F, message=F}
+library(Seurat)
+library(ggplot2)
+library(jsonlite)
+library(data.table)
+library(knitr)
+library(Matrix)
+library(scales)
+
+
+data <- readRDS(snakemake@input$seurat_object)
+
+sample_description <- fread(snakemake@input$sample_description)
+kallisto_data <- read_json(snakemake@input$kallisto_run_info)
+bustools_full_info <- read_json(snakemake@input$bus_full_info)
+bustools_corrected_info <- read_json(snakemake@input$bus_correct_info)
+
+
+filtering_stats <- read_json(snakemake@input$filtering_stats)
+seurat_stats <- read_json(snakemake@input$seurat_stats)
+
+```
+
+
+## Sample description
+
+```{r, echo=F}
+importantFields <- c("db", "GSE", "GSM", "secondary_sample_accession",
+                     "scientific_name", "technology", "ProcessingMode")
+kable(t(sample_description[, ..importantFields]))
+```
+
+<details>
+<summary>Click to see full table</summary>
+```{r, echo=F }
+kable(t(sample_description))
+```
+</details> 
+
+## Alignment info
+
+| <!-- -->    | <!-- -->    |
+|-------------|-------------|
+|Total reads           |`r format(kallisto_data$n_processed, big.mark=",")`     |
+|Pseudoaligned reads   |`r format(kallisto_data$n_pseudoaligned, big.mark=",")` |
+|Percent pseudoaligned |`r kallisto_data$p_pseudoaligned` |
+
+
+<details>
+<summary>Click to see full `run_info.json` content </summary>
+```{r, echo=F }
+kallisto_data
+```
+</details> 
+
+## Bustools info
+
+| <!-- -->    | Full BUS file  | Corrected BUS file    |
+|-------------|----------------|-----------------------|
+|Total BUS records     |`r format(bustools_full_info$numRecords, big.mark=",")`     |`r format(bustools_corrected_info$numRecords, big.mark=",")`     |
+|Total reads   |`r format(bustools_full_info$numReads, big.mark=",")`     |`r format(bustools_corrected_info$numReads, big.mark=",")`     |
+|Total barcodes |`r format(bustools_full_info$numBarcodes, big.mark=",")`     |`r format(bustools_corrected_info$numBarcodes, big.mark=",")`     |
+|Median reads per barcode  |`r format(bustools_full_info$medianReadsPerBarcode, big.mark=",")`     |`r format(bustools_corrected_info$medianReadsPerBarcode, big.mark=",")`     |
+|Mean reads per barcode |`r sprintf("%.2f", bustools_full_info$meanReadsPerBarcode)`     |`r sprintf("%.2f", bustools_corrected_info$meanReadsPerBarcode)`     |
+|Barcode UMIs |`r format(bustools_full_info$numBarcodeUMIs, big.mark=",")`|`r format(bustools_corrected_info$numBarcodeUMIs, big.mark=",")`     |
+|Median UMIs per barcode |`r format(bustools_full_info$medianUMIsPerBarcode, big.mark=",")`     |`r format(bustools_corrected_info$medianUMIsPerBarcode, big.mark=",")`     |
+|Mean UMIs per barcode |`r sprintf("%.2f", bustools_full_info$meanUMIsPerBarcode)`|`r sprintf("%.2f", bustools_corrected_info$meanUMIsPerBarcode)`     |
+|Whitelisted Barcodes |`r format(bustools_full_info$numBarcodesOnWhitelist, big.mark=",")`|`r format(bustools_corrected_info$numBarcodesOnWhitelist, big.mark=",")`     |
+|Whitelisted Barcodes % |`r sprintf("%.2f", bustools_full_info$percentageBarcodesOnWhitelist)` |`r sprintf("%.2f", bustools_corrected_info$percentageBarcodesOnWhitelist)`     |
+|Reads with whitelisted barcode |`r format(bustools_full_info$numReadsOnWhitelist, big.mark=",")`  |`r format(bustools_corrected_info$numReadsOnWhitelist, big.mark=",")`     |
+|Reads with whitelisted barcode % |`r sprintf("%.2f", bustools_full_info$percentageReadsOnWhitelist)` |`r sprintf("%.2f", bustools_corrected_info$percentageReadsOnWhitelist)`     |
+
+<details>
+<summary>Click to see full `bus_full_info.json` content </summary>
+```{r, echo=F }
+bustools_full_info
+```
+</details> 
+
+<details>
+<summary>Click to see full `bus_correct_info.json` content </summary>
+```{r, echo=F }
+bustools_corrected_info
+```
+</details> 
+
+
+## Empty drops
+
+```{r }
+
+unfiltered_counts <- readMM(snakemake@input$mtx)
+rownames(unfiltered_counts) <- barcodes <- readLines(snakemake@input$barcodes)
+colnames(unfiltered_counts) <- genes <- readLines(snakemake@input$genes)
+dim(unfiltered_counts)
+
+filtered_counts <- readRDS(snakemake@input$filtered_counts)
+real_barcodes <- colnames(filtered_counts)
+
+knee_data <- rowSums(unfiltered_counts)
+head(knee_data)
+knee_data <- sort(knee_data, decreasing = T)
+plot_data <- data.frame(
+  barcodes=1:length(knee_data),
+  umis=knee_data,
+  is_real=names(knee_data) %in% real_barcodes
+)
+
+ggplot(data=plot_data, aes(x=barcodes, y=knee_data, color=is_real)) +
+  geom_point() +
+  scale_x_log10(labels = scales::comma) + 
+  scale_y_log10(labels = scales::comma) +
+  theme_bw()
+
+```

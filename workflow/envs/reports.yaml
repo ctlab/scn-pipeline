@@ -1,0 +1,10 @@
+name: r-reports-generation
+channels:
+ - conda-forge
+dependencies:
+ - r-base=4.0.3
+ - r-cairo=1.5_15
+ - r-ggplot2=3.3.2
+ - r-seurat=4.1.1
+ - r-jsonlite=1.7.1
+ - r-rmarkdown=2.5

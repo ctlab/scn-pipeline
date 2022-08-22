@@ -1,0 +1,6 @@
+name: r-isolate-sample
+channels:
+ - conda-forge
+dependencies:
+ - r-base=4.0.3
+ - r-yaml=2.2.1
