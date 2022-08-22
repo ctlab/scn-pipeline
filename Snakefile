@@ -19,7 +19,6 @@ wildcard_constraints:
 
 include: "workflow/rules/resources/get_all_resources.smk"
 include: "workflow/rules/preparation/get_all_meta.smk"
-include: "workflow/rules/processing/star/star.smk"
 include: "workflow/rules/processing/get_file.smk"
 include: "workflow/rules/analysis/analysis.smk"
 

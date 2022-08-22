@@ -47,6 +47,4 @@ use rule merge_samples as merge_samples_forced with:
         elbow_plot=report(config["out_dir"] + "/data/datasets/{dataset}/forced/plots/elbow_plot.pdf"),
         tsne_plot=report(config["out_dir"] + "/data/datasets/{dataset}/forced/plots/tsne_plot.pdf"),
         umap_plot=report(config["out_dir"] + "/data/datasets/{dataset}/forced/plots/umap_plot.pdf")
-    log: config['logs_dir'] + "/{dataset}/forced/merge_samples_forced.log"
-    benchmark: config['logs_dir'] + "/{dataset}/forced/merge_samples.benchmark"
 
