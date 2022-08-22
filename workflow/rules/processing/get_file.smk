@@ -15,10 +15,11 @@ rule ncbi_prefetch:
     output:
         sra=temp(config["ncbi_dir"] + "/sra/{run}.sra")
     params:
-        run="{run}"
+        run="{run}",
+        max_size="50g"
     conda: "../../envs/entrez_direct_utils.yaml"
     shell: """
-    prefetch {params.run}
+    prefetch --max-size {params.max_size} {params.run}
     """
 
 rule get_file:
