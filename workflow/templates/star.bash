@@ -34,7 +34,6 @@ STAR --genomeDir $index_dir \
   --soloCBstart 1 --soloCBlen 12 --soloUMIstart 13 --soloUMIlen 8 \
   --soloBarcodeReadLength 0 \
   --soloType CB_UMI_Simple \
-  --soloCBwhitelist {{ whitelist }} \
   --outFileNamePrefix {{ out_dir }} \
   --runThreadN {{ threads }} \
   --readFilesCommand zcat \
