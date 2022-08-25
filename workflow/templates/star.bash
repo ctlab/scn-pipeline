@@ -22,6 +22,23 @@ STAR --genomeDir $index_dir \
 
     {% endif %}
   {% endif %}
+
+  {% if processing_mode == "bam" %}
+
+STAR --genomeDir $index_dir \
+  --readFilesIn {{ bam|join(",") }} \
+  --readFilesType SAM SE \
+  --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR --soloUMIdedup 1MM_CR \
+  --soloInputSAMattrBarcodeSeq CR UR --soloInputSAMattrBarcodeQual CY UY \
+  --soloType CB_UMI_Simple \
+  --soloCBwhitelist {{ whitelist }} \
+  --outFileNamePrefix {{ out_dir }} \
+  --runThreadN {{ threads }} \
+  --readFilesCommand samtools view -F 0x100 \
+  --outSAMtype BAM Unsorted
+
+  {% endif %}
+
 {% endif %}
 
 {% if technology == "DROPSEQ" %}
