@@ -21,7 +21,7 @@ def run_star_input(wildcards):
         if processing_mode == FILETYPE_BAM:
             result[TYPE_BAM] = dispatcher.get_bam(wildcards)
 
-    if processing_mode == TECH_DROPSEQ:
+    if technology == TECH_DROPSEQ:
         if processing_mode == FILETYPE_FASTQ or processing_mode == FILETYPE_FQDUMP:
             result[TYPE_BARCODE] = dispatcher.get_barcode_reads(wildcards)
             result[TYPE_CDNA] = dispatcher.get_cdna_reads(wildcards)
