@@ -18,17 +18,18 @@ data[['nFeature_RNA_log10']] <- log10(data[['nFeature_RNA']] + 1)
 
 
 ## QC Plots
-VlnPlot(data, features = c("nFeature_RNA","nCount_RNA","percent.mt"), pt.size=0.1)
-ggsave(snakemake@output$vln_feature_plots, width=6, height=4)
+vlnFeaturePlots <- VlnPlot(data, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), pt.size=0.1)
+ggsave(snakemake@output$vln_feature_plots, plot=vlnFeaturePlots, width=6, height=4)
   
-FeatureScatter(data, feature1 = "nCount_RNA", feature2 = "percent.mt") + theme(aspect.ratio = 1)
-ggsave(snakemake@output$umi_mt_plot, width=6, height=4)
+umiMtPlot <- FeatureScatter(data, feature1 = "nCount_RNA", feature2 = "percent.mt") + theme(aspect.ratio = 1)
+ggsave(snakemake@output$umi_mt_plot, plot=umiMtPlot, width=6, height=4)
 
-FeatureScatter(data, feature1 = "nCount_RNA_log10", feature2 = "nFeature_RNA_log10") + theme(aspect.ratio = 1)
-ggsave(snakemake@output$umi_features_log10_plot, width=6, height=4)
+umiFeaturesLog10Plot <- FeatureScatter(data, feature1 = "nCount_RNA_log10", feature2 = "nFeature_RNA_log10") +
+  theme(aspect.ratio = 1)
+ggsave(snakemake@output$umi_features_log10_plot, plot=umiFeaturesLog10Plot, width=6, height=4)
 
-FeatureScatter(data, feature1 = "nCount_RNA", feature2 = "nFeature_RNA") + theme(aspect.ratio = 1)
-ggsave(snakemake@output$umi_features_plot, width=6, height=4)
+umiFeaturesPlot <- FeatureScatter(data, feature1 = "nCount_RNA", feature2 = "nFeature_RNA") + theme(aspect.ratio = 1)
+ggsave(snakemake@output$umi_features_plot, plot=umiFeaturesPlot, width=6, height=4)
 
 ## Number of cells before
 
@@ -41,17 +42,18 @@ data <- RunMiQC(data,
                 model.slot = "flexmix_model")
 
 tryCatch({
-  PlotMiQC(data, color.by = "miQC.probability") +
+  miqcPlotProb <- PlotMiQC(data, color.by = "miQC.probability") +
     scale_color_gradient(low = "grey", high = "purple")
-  ggsave(snakemake@output$miqc_plot_prob, width=6, height=4)
+  ggsave(snakemake@output$miqc_plot_prob, plot=miqcPlotProb, width=6, height=4)
 }, error = function(e) {
   message(e)
   pdf(snakemake@output$miqc_plot_prob, width=6, height=4)
   dev.off()
 })
 
-FeatureScatter(data, feature1 = "nFeature_RNA", feature2 = "percent.mt", group.by = "miQC.keep") + theme(aspect.ratio = 1)
-ggsave(snakemake@output$miqc_plot_keep, width=6, height=4)
+miqcPlotKeep <- FeatureScatter(data, feature1 = "nFeature_RNA", feature2 = "percent.mt", group.by = "miQC.keep") +
+  theme(aspect.ratio = 1)
+ggsave(snakemake@output$miqc_plot_keep, plot=miqcPlotKeep, width=6, height=4)
 
 ## FILTER MT CONTENT
 
@@ -74,20 +76,22 @@ seurat_stats$cells_filtered_mt <- cells.before-cells.after
 
 ## QC Plots
 
-VlnPlot(data, features = c("nFeature_RNA_log10","nCount_RNA_log10","percent.mt"), pt.size=0.1)
-ggsave(snakemake@output$vln_feature_plots_after_log, width=6, height=4)
+vlnFeaturePLotsAfterLog <- VlnPlot(data, features = c("nFeature_RNA_log10","nCount_RNA_log10","percent.mt"), pt.size=0.1)
+ggsave(snakemake@output$vln_feature_plots_after_log, plot=vlnFeaturePLotsAfterLog, width=6, height=4)
 
-VlnPlot(data, features = c("nFeature_RNA","nCount_RNA","percent.mt"), pt.size=0.1)
-ggsave(snakemake@output$vln_feature_plots_after, width=6, height=4)
+vlnFeaturePlotsAfter <- VlnPlot(data, features = c("nFeature_RNA","nCount_RNA","percent.mt"), pt.size=0.1)
+ggsave(snakemake@output$vln_feature_plots_after, plot=vlnFeaturePlotsAfter, width=6, height=4)
 
-FeatureScatter(data, feature1 = "nCount_RNA", feature2 = "percent.mt") + theme(aspect.ratio = 1)
-ggsave(snakemake@output$umi_mt_plot_after, width=6, height=4)
+umiMtPlotAfter <- FeatureScatter(data, feature1 = "nCount_RNA", feature2 = "percent.mt") + theme(aspect.ratio = 1)
+ggsave(snakemake@output$umi_mt_plot_after, plot=umiMtPlotAfter, width=6, height=4)
 
-FeatureScatter(data, feature1 = "nCount_RNA_log10", feature2 = "nFeature_RNA_log10") + theme(aspect.ratio = 1)
-ggsave(snakemake@output$umi_features_log10_plot_after, width=6, height=4)
+umiFeaturesLog10PlotAfter <- FeatureScatter(data, feature1 = "nCount_RNA_log10", feature2 = "nFeature_RNA_log10") +
+  theme(aspect.ratio = 1)
+ggsave(snakemake@output$umi_features_log10_plot_after, plot=umiFeaturesLog10PlotAfter, width=6, height=4)
 
-FeatureScatter(data, feature1 = "nCount_RNA", feature2 = "nFeature_RNA") + theme(aspect.ratio = 1)
-ggsave(snakemake@output$umi_features_plot_after, width=6, height=4)
+umiFeaturesPlotAfter <- FeatureScatter(data, feature1 = "nCount_RNA", feature2 = "nFeature_RNA") +
+  theme(aspect.ratio = 1)
+ggsave(snakemake@output$umi_features_plot_after, plot=umiFeaturesPlotAfter, width=6, height=4)
 
 
 ## NORMALIZATION
@@ -102,13 +106,12 @@ data <- SCTransform(
 )
 
 ## PCA
-gc()
 data <- RunPCA(object = data,
                features = VariableFeatures(object = data), 
                npcs=50)
 
-ElbowPlot(data, ndims = 50)
-ggsave(snakemake@output$elbow_plot, width=6, height=4)
+elbowPlot <- ElbowPlot(data, ndims = 50)
+ggsave(snakemake@output$elbow_plot, plot=elbowPlot, width=6, height=4)
 
 ## TSNE
 
@@ -145,11 +148,11 @@ for (ident in allIdents) {
 
 Idents(data) <- data[[defaultIdent]]
 
-DimPlot(data, reduction = "tsne") + theme(aspect.ratio = 1)
-ggsave(snakemake@output$tsne_plot, width=6, height=4)
+tsnePlot <- DimPlot(data, reduction = "tsne") + theme(aspect.ratio = 1)
+ggsave(snakemake@output$tsne_plot, plot=tsnePlot, width=6, height=4)
 
-DimPlot(data, reduction = "umap") + theme(aspect.ratio = 1)
-ggsave(snakemake@output$umap_plot, width=6, height=4)
+umapPlot <- DimPlot(data, reduction = "umap") + theme(aspect.ratio = 1)
+ggsave(snakemake@output$umap_plot, plot=umapPlot, width=6, height=4)
 
 
 ## SAVING: DATASET
