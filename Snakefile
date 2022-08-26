@@ -43,3 +43,5 @@ rule process_all:
         merged=expand(rules.merge_samples.output.seurat, dataset=datasets_full),
         merged_markers=expand(rules.markers_default_merged.output.markers, zip, dataset=datasets_full),
         merged_pct=expand(rules.markers_default_merged.output.pct, zip, dataset=datasets_full)
+
+localrules: process_all, print_sample_names
