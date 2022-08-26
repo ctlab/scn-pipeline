@@ -3,7 +3,7 @@ import json
 import os
 from functools import reduce
 from typing import List, Dict, Union, Any
-from workflow.scripts.Constants import *
+from Constants import *
 
 
 class FFQJSonEncoder(json.JSONEncoder):
@@ -182,7 +182,7 @@ class Dataset(JsonYamlSerializable):
     def __init__(self, **kwargs):
         self.accession: str = kwargs.get("accession")
         self.title: str = kwargs.get("title", "")
-        self.db: Union[str, None] = None
+        self.db: str = ""
         self.samples: Dict[str, Sample] = {}
         self.organisms: set[str] = set()
         self.attributes: Dict[str, str] = {}

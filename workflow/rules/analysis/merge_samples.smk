@@ -23,10 +23,10 @@ rule merge_samples:
     input:
         objects = merge_samples_input
     output:
-        seurat = config["out_dir"] + "/data/datasets/{dataset}/full/seurat.rds",
-        elbow_plot= report(config["out_dir"] + "/data/datasets/{dataset}/full/plots/elbow_plot.pdf"),
-        tsne_plot= report(config["out_dir"] + "/data/datasets/{dataset}/full/plots/tsne_plot.pdf"),
-        umap_plot= report(config["out_dir"] + "/data/datasets/{dataset}/full/plots/umap_plot.pdf")
+        seurat = config["out_dir"] + "/data/datasets/{dataset}/seurat.rds",
+        elbow_plot= report(config["out_dir"] + "/data/datasets/{dataset}/plots/elbow_plot.pdf"),
+        tsne_plot= report(config["out_dir"] + "/data/datasets/{dataset}/plots/tsne_plot.pdf"),
+        umap_plot= report(config["out_dir"] + "/data/datasets/{dataset}/plots/umap_plot.pdf")
     params:
         resolutions = RESOLUTIONS,
         default_resolution = DEFAULT_RESOLUTION,
@@ -34,8 +34,8 @@ rule merge_samples:
     threads: 4
     resources:
         mem_mb=64000
-    log: config['logs_dir'] + "/{dataset}/full/merge_samples.log"
-    benchmark: config['logs_dir'] + "/{dataset}/full/merge_samples.benchmark"
+    log: config['logs_dir'] + "/{dataset}/merge_samples.log"
+    benchmark: config['logs_dir'] + "/{dataset}/merge_samples.benchmark"
     conda: "../../envs/seurat_analysis.yaml"
     script: "../../scripts/merge.R"
 

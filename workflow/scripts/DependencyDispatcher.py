@@ -1,10 +1,5 @@
-import os
-from .Classes import *
-from .Constants import *
-
-
-class Object(object):
-    pass
+from Classes import *
+from snakemake.workflow import Wildcards
 
 
 def if_empty_return(ret_val):
@@ -18,16 +13,15 @@ def if_empty_return(ret_val):
     return decorator
 
 
+class Object(object):
+    pass
+
+
 class DependencyDispatcher(object):
 
     @staticmethod
-    def get_wildcards_placeholder():
+    def get_wildcards_placeholder() -> Object:
         return Object()
-
-    TAX_IDS = {
-        9606: 'hs',
-        10090: 'mm'
-    }
 
     ORGANISM_MAPPING = {
         'Mus musculus': 'mm',
@@ -42,10 +36,10 @@ class DependencyDispatcher(object):
         self.out_dir = config["out_dir"]
 
     def get_datasets(self) -> Dict[str, Dataset]:
-        dataset_list = {}
+        dataset_map = {}
         if os.path.exists(self.samples_file):
-            dataset_list = parse_sample_descriptions(json.load(open(self.samples_file, "r")))
-        return dataset_list
+            dataset_map = parse_sample_descriptions(json.load(open(self.samples_file, "r")))
+        return dataset_map
 
     def get_dataset(self, wildcard) -> Dataset:
         return self.get_datasets()[wildcard.dataset]
@@ -98,70 +92,36 @@ class DependencyDispatcher(object):
         return DependencyDispatcher.ORGANISM_MAPPING[sample.organism]
 
     @if_empty_return(None)
-    def get_db(self, wildcards):
+    def get_db(self, wildcards) -> str:
         return self.get_dataset(wildcards).db
 
     @if_empty_return(None)
-    def kallisto_idx(self, wildcards):
-        species = self.get_species(wildcards)
-        return self.resources + f"/kallisto/{species}/index.idx"
-
-    @if_empty_return(None)
-    def kallisto_t2g(self, wildcards):
-        species = self.get_species(wildcards)
-        return self.resources + f"/kallisto/{species}/t2g.txt"
-
-    @if_empty_return(None)
-    def alevin_index(self, wildcards):
-        species = self.get_species(wildcards)
-        return self.resources + f"/salmon/{species}/index"
-
-    @if_empty_return(None)
-    def alevin_t2g(self, wildcards):
-        species = self.get_species(wildcards)
-        return self.resources + f"/salmon/{species}/ref/splici_fl86_t2g_3col.tsv"
-
-    @if_empty_return(None)
-    def star_index(self, wildcards):
+    def star_index(self, wildcards) -> str:
         species = self.get_species(wildcards)
         return self.resources + f"/star/{species}/SA"
 
     @if_empty_return(None)
-    def get_technology(self, wildcards):
+    def get_technology(self, wildcards) -> str:
         sample = self.get_sample(wildcards)
         return sample.get_technology()
 
     @if_empty_return(None)
-    def get_processing_mode(self, wildcards):
+    def get_processing_mode(self, wildcards) -> str:
         sample = self.get_sample(wildcards)
         return sample.get_processing_mode()
 
     @if_empty_return(None)
-    def get_version(self, wildcards):
+    def get_version(self, wildcards) -> int:
         sample = self.get_sample(wildcards)
         return sample.get_version()
 
     @if_empty_return(None)
-    def get_whitelist(self, wildcards):
+    def get_whitelist(self, wildcards) -> str:
         sample = self.get_sample(wildcards)
         return sample.get_whitelist()
 
-    @if_empty_return(None)
-    def get_kallisto_tech_name(self, wildcards):
-        sample = self.get_sample(wildcards)
-        if sample.get_technology() == TECH_10X:
-            version = sample.get_version()
-            return f"10xv{version}"
-
-    @if_empty_return(None)
-    def get_alevin_tech_name(self, wildcards):
-        sample = self.get_sample(wildcards)
-        if sample.get_technology() == TECH_10X:
-            version = sample.get_version()
-            return f"v{version}"
-
     @if_empty_return([])
-    def get_barcode_reads(self, wildcards):
+    def get_barcode_reads(self, wildcards) -> List[str]:
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         barcodes = [
@@ -171,7 +131,7 @@ class DependencyDispatcher(object):
         return barcodes
 
     @if_empty_return([])
-    def get_cdna_reads(self, wildcards):
+    def get_cdna_reads(self, wildcards) -> List[str]:
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         cdna = [
@@ -181,7 +141,7 @@ class DependencyDispatcher(object):
         return cdna
 
     @if_empty_return([])
-    def get_index_reads(self, wildcards):
+    def get_index_reads(self, wildcards) -> List[str]:
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         index = [
@@ -191,7 +151,7 @@ class DependencyDispatcher(object):
         return index
 
     @if_empty_return([])
-    def get_bam(self, wildcards):
+    def get_bam(self, wildcards) -> List[str]:
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         bam = [
