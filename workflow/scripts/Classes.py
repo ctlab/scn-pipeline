@@ -2,8 +2,8 @@ import yaml
 import json
 import os
 from functools import reduce
-from typing import List, Dict, Union, Any
-from Constants import *
+from typing import List, Dict, Any
+from workflow.scripts.Constants import *
 
 
 class FFQJSonEncoder(json.JSONEncoder):

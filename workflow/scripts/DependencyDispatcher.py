@@ -1,5 +1,4 @@
-from Classes import *
-from snakemake.workflow import Wildcards
+from workflow.scripts.Classes import *
 
 
 def if_empty_return(ret_val):
