@@ -1,10 +1,19 @@
 import yaml
 import json
 import os
-import re
 from functools import reduce
-from typing import List, Dict, Union
-from .Constants import *
+from typing import List, Dict, Union, Any
+from workflow.scripts.Constants import *
+
+
+class FFQJSonEncoder(json.JSONEncoder):
+    def default(self, o: Any) -> Any:
+        if isinstance(o, JsonYamlSerializable):
+            return o.__dict__
+        elif isinstance(o, set):
+            return list(o)
+        else:
+            return super().default(o)
 
 
 class JsonYamlSerializable(object):
@@ -15,7 +24,7 @@ class JsonYamlSerializable(object):
         return yaml.dump(self.__dict__)
 
     def json(self) -> str:
-        return json.dumps(self.__dict__)
+        return FFQJSonEncoder().encode(self.__dict__)
 
     @classmethod
     def load(cls, values):
@@ -185,10 +194,10 @@ class Dataset(JsonYamlSerializable):
         else:
             raise Exception(f"Dataset {self.accession} is from unknown db")
 
-        if self.db == Dataset.GEO:
+        if self.db == Dataset.GEO and "geo_samples" in kwargs:
             for key, sample in kwargs["geo_samples"].items():
                 self.samples[key] = Sample.parse_geo_sample(sample)
-        elif self.db == Dataset.ENA:
+        else:
             for key, sample in kwargs["samples"].items():
                 self.samples[key] = Sample(**sample)
 
