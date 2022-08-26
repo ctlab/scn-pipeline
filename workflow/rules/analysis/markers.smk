@@ -25,7 +25,7 @@ use rule markers as markers_merged with:
     output:
         marker_dir = directory(config["out_dir"] + "/data/datasets/{dataset}/markers")
     log: config['logs_dir'] + "/{dataset}/markers.log"
-    benchmark: config['logs_dir'] + "/{dataset}//markers.benchmark"
+    benchmark: config['logs_dir'] + "/{dataset}/markers.benchmark"
 
 
 rule markers_default:
