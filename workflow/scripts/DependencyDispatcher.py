@@ -1,8 +1,10 @@
 from workflow.scripts.Classes import *
+from snakemake.io import Wildcards
+from typing import Callable
 
 
-def if_empty_return(ret_val):
-    def decorator(func):
+def if_empty_return(ret_val) -> Callable:
+    def decorator(func) -> Callable:
         def wrapper(self, *args, **kwargs):
             if self.get_datasets() is None:
                 return ret_val
@@ -12,15 +14,7 @@ def if_empty_return(ret_val):
     return decorator
 
 
-class Object(object):
-    pass
-
-
 class DependencyDispatcher(object):
-
-    @staticmethod
-    def get_wildcards_placeholder() -> Object:
-        return Object()
 
     ORGANISM_MAPPING = {
         'Mus musculus': 'mm',
@@ -29,7 +23,7 @@ class DependencyDispatcher(object):
         'homo sapiens': 'hs',
     }
 
-    def __init__(self, config):
+    def __init__(self, config: dict):
         self.samples_file = config['samples']
         self.resources = config["resources"]
         self.out_dir = config["out_dir"]
@@ -40,8 +34,8 @@ class DependencyDispatcher(object):
             dataset_map = parse_sample_descriptions(json.load(open(self.samples_file, "r")))
         return dataset_map
 
-    def get_dataset(self, wildcard) -> Dataset:
-        return self.get_datasets()[wildcard.dataset]
+    def get_dataset(self, wildcards: Wildcards) -> Dataset:
+        return self.get_datasets()[wildcards.get('dataset')]
 
     @if_empty_return([])
     def get_all_datasets(self) -> List[str]:
@@ -56,105 +50,108 @@ class DependencyDispatcher(object):
         return list(samples)
 
     @if_empty_return([])
-    def get_samples(self, wildcards) -> Dict[str, Sample]:
-        dataset = wildcards.dataset
-        return self.get_datasets()[dataset].samples
+    def get_samples(self, wildcards: Wildcards) -> Dict[str, Sample]:
+        return self.get_datasets()[wildcards.get("dataset")].samples
 
     @if_empty_return([])
-    def get_sample_names(self, wildcards) -> List[str]:
+    def get_sample_names(self, wildcards: Wildcards) -> List[str]:
         return list(self.get_samples(wildcards).keys())
 
     @if_empty_return(None)
-    def get_sample(self, wildcards) -> Sample:
+    def get_sample(self, wildcards: Wildcards) -> Sample:
         samples = self.get_samples(wildcards)
-        sample = samples[wildcards.sample]
+        sample = samples[wildcards.get("sample")]
         return sample
 
     @if_empty_return([])
-    def get_runs(self, wildcards) -> List[Run]:
+    def get_runs(self, wildcards: Wildcards) -> List[Run]:
         sample = self.get_sample(wildcards)
         return sample.get_all_runs()
 
     @if_empty_return(None)
-    def get_run(self, wildcards) -> Run:
+    def get_run(self, wildcards: Wildcards) -> Run:
         runs = self.get_runs(wildcards)
-        run = [run for run in runs if run.accession == wildcards.run][0]
+        run = [run for run in runs if run.accession == wildcards.get("run")][0]
         return run
 
     @if_empty_return([])
-    def get_run_names(self, wildcards) -> List[str]:
+    def get_run_names(self, wildcards: Wildcards) -> List[str]:
         return [run.accession for run in self.get_runs(wildcards)]
 
     @if_empty_return(None)
-    def get_species(self, wildcards) -> str:
+    def get_species(self, wildcards: Wildcards) -> str:
         sample = self.get_sample(wildcards)
         return DependencyDispatcher.ORGANISM_MAPPING[sample.organism]
 
     @if_empty_return(None)
-    def get_db(self, wildcards) -> str:
+    def get_db(self, wildcards: Wildcards) -> str:
         return self.get_dataset(wildcards).db
 
     @if_empty_return(None)
-    def star_index(self, wildcards) -> str:
+    def star_index(self, wildcards: Wildcards) -> str:
         species = self.get_species(wildcards)
         return self.resources + f"/star/{species}/SA"
 
     @if_empty_return(None)
-    def get_technology(self, wildcards) -> str:
+    def get_technology(self, wildcards: Wildcards) -> str:
         sample = self.get_sample(wildcards)
         return sample.get_technology()
 
     @if_empty_return(None)
-    def get_processing_mode(self, wildcards) -> str:
+    def get_processing_mode(self, wildcards: Wildcards) -> str:
         sample = self.get_sample(wildcards)
         return sample.get_processing_mode()
 
     @if_empty_return(None)
-    def get_version(self, wildcards) -> int:
+    def get_version(self, wildcards: Wildcards) -> int:
         sample = self.get_sample(wildcards)
         return sample.get_version()
 
     @if_empty_return(None)
-    def get_whitelist(self, wildcards) -> str:
+    def get_whitelist(self, wildcards: Wildcards) -> str:
         sample = self.get_sample(wildcards)
         return sample.get_whitelist()
 
     @if_empty_return([])
-    def get_barcode_reads(self, wildcards) -> List[str]:
+    def get_barcode_reads(self, wildcards: Wildcards) -> List[str]:
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         barcodes = [
-            run.get_barcode_read().get_path(self.out_dir + f"/data/samples/{wildcards.dataset}/{wildcards.sample}")
+            run.get_barcode_read().get_path(self.out_dir +
+                                            f"/data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
             for run in runs if run.get_barcode_read() is not None
         ]
         return barcodes
 
     @if_empty_return([])
-    def get_cdna_reads(self, wildcards) -> List[str]:
+    def get_cdna_reads(self, wildcards: Wildcards) -> List[str]:
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         cdna = [
-            run.get_cdna_read().get_path(self.out_dir + f"/data/samples/{wildcards.dataset}/{wildcards.sample}")
+            run.get_cdna_read().get_path(self.out_dir +
+                                         f"/data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
             for run in runs if run.get_cdna_read() is not None
         ]
         return cdna
 
     @if_empty_return([])
-    def get_index_reads(self, wildcards) -> List[str]:
+    def get_index_reads(self, wildcards: Wildcards) -> List[str]:
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         index = [
-            run.get_index_read().get_path(self.out_dir + f"/data/samples/{wildcards.dataset}/{wildcards.sample}")
+            run.get_index_read().get_path(self.out_dir +
+                                          f"/data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
             for run in runs if run.get_index_read() is not None
         ]
         return index
 
     @if_empty_return([])
-    def get_bam(self, wildcards) -> List[str]:
+    def get_bam(self, wildcards: Wildcards) -> List[str]:
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         bam = [
-            run.get_bam().get_path(self.out_dir + f"/data/samples/{wildcards.dataset}/{wildcards.sample}")
+            run.get_bam().get_path(self.out_dir +
+                                   f"/data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
             for run in runs if run.get_bam() is not None
         ]
         return bam
