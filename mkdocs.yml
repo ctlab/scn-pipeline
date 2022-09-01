@@ -1,0 +1,12 @@
+site_name: scNavigator pipeline documentation
+site_url: https://artyomovlab.wustl.edu/scn/
+nav:
+    - Home: index.md
+    - Overview: [overview.md, dependency_dispatcher.md, meta.md, processing.md, analysis.md]
+theme: material
+markdown_extensions:
+  - pymdownx.highlight:
+        anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
