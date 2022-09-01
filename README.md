@@ -3,6 +3,7 @@
 This repository is a Snakemake pipeline that we use to process public scRNA-seq data in scNavigator.
 The scope of the main branch is to process the raw data and run basic seurat analysis.
 
+Read the full documentation at https://scn-pipeline.readthedocs.io/.
 
 To install the pipeline, please, clone the main branch and install snakemake
 ```bash
