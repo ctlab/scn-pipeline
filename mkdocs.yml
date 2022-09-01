@@ -1,5 +1,5 @@
 site_name: scNavigator pipeline documentation
-site_url: https://artyomovlab.wustl.edu/scn/
+site_url: https://scn-pipeline.readthedocs.io/
 nav:
     - Home: index.md
     - Overview: [overview.md, dependency_dispatcher.md, meta.md, processing.md, analysis.md]
