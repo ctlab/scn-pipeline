@@ -35,13 +35,17 @@ for dataset in datasets.keys():
         datasets_full.append(dataset)
         samples_full.append(sample)
 
+DEFAULT_RESOLUTION = 2
+
 rule process_all:
     input:
         seurat=expand(rules.seurat_analysis.output.seurat, zip, dataset=datasets_full, sample=samples_full),
-        markers=expand(rules.markers_default.output.markers, zip, dataset=datasets_full, sample=samples_full),
-        pct=expand(rules.markers_default.output.pct, zip, dataset=datasets_full, sample=samples_full),
+        markers=expand(rules.markers.output.markers[DEFAULT_RESOLUTION], zip, dataset=datasets_full, sample=samples_full),
+        pct=expand(rules.markers.output.clusters_pct[DEFAULT_RESOLUTION], zip, dataset=datasets_full, sample=samples_full),
+        average=expand(rules.markers.output.clusters_avg[DEFAULT_RESOLUTION],zip,dataset=datasets_full,sample=samples_full),
         merged=expand(rules.merge_samples.output.seurat, dataset=datasets_full),
-        merged_markers=expand(rules.markers_default_merged.output.markers, zip, dataset=datasets_full),
-        merged_pct=expand(rules.markers_default_merged.output.pct, zip, dataset=datasets_full)
+        merged_markers=expand(rules.markers_merged.output.markers[DEFAULT_RESOLUTION], dataset=datasets_full),
+        merged_pct=expand(rules.markers_merged.output.clusters_pct[DEFAULT_RESOLUTION], dataset=datasets_full),
+        merged_average=expand(rules.markers_merged.output.clusters_avg[DEFAULT_RESOLUTION], dataset=datasets_full)
 
 localrules: process_all, print_sample_names
