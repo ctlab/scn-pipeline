@@ -1,6 +1,6 @@
 # Obtaining meta information
 
-![Rule graph for obtaining meta information](images/meta_rulepragh.svg)
+![Rule graph for obtaining meta information](images/meta_rulegraph.svg)
 
 *Above: Rule graph for obtaining meta information*
 
