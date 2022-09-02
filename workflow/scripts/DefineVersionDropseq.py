@@ -58,11 +58,12 @@ def get_files_from_fastq_dump(srr_accession,
     if not os.path.exists(header_dir):
         os.makedirs(header_dir)
 
+    sra_file = os.path.join(ncbi_dir, "sra", f"{srr_accession}.sra")
+
     command = f"parallel-fastq-dump " \
-              f"--sra-id {srr_accession} " \
+              f"-s {sra_file} " \
               f"--threads {threads} " \
               f"--outdir {header_dir}/ " \
-              f"--tmpdir . " \
               f"--split-files " \
               f"--gzip " \
               f"-X {READS_TO_CHECK}"
