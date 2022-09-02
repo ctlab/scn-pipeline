@@ -10,7 +10,7 @@ To obtain meta information we first use [FFQ](https://github.com/pachterlab/ffq)
 `get_meta_single` rule:
 
 ``` py title="workflow/rules/preparation/get_dataset_meta.smk" hl_lines="10 11"
-rule get_meta_single:
+checkpoint get_meta_single:
     params: dataset="{dataset}"
     output: ffq_json=config['out_dir'] +"/meta/{dataset}/ffq_raw.json",
     log: config['logs_dir'] + "/{dataset}/ffq.log"
@@ -23,6 +23,9 @@ rule get_meta_single:
     if grep "error_msg" {output.ffq_json}; then exit 1; fi
     """
 ```
+
+The `get_meta_single` rule is a checkpoint (for `define_tech` rule),
+this allows us to later re-evaluate execution DAG to get all runs with `ncbi_prefetch`.
 
 ## 10x whitelists
 

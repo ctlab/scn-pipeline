@@ -1,5 +1,5 @@
 
-rule get_meta_single:
+checkpoint get_meta_single:
     params: dataset="{dataset}"
     output: ffq_json=config['out_dir'] +"/meta/{dataset}/ffq_raw.json",
     log: config['logs_dir'] + "/{dataset}/ffq.log"
