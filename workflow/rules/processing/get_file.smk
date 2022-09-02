@@ -1,37 +1,36 @@
+import os.path
+from pathlib import Path
 from workflow.scripts.DependencyDispatcher import DependencyDispatcher
 
-def get_file_param(wildcards):
-    files = DependencyDispatcher(config).get_run(wildcards).files
-    file = [file for file in files if file.filename == wildcards.filename][0]
-    return file
 
-def get_url(wildcards):
-    return get_file_param(wildcards).url
-
-def get_md5sum(wildcards):
-    return get_file_param(wildcards).md5
+dispatcher = DependencyDispatcher(config)
 
 rule ncbi_prefetch:
     output:
-        sra=temp(config["ncbi_dir"] + "/sra/{run}.sra")
+        sra=temp(Path(config["ncbi_dir"], "sra/{run}.sra"))
     params:
         run="{run}",
         max_size="100g"
+    log: "./logs/{run}/ncbi_prefetch.log"
+    benchmark: "./logs/{run}/ncbi_prefetchbenchmark"
     conda: "../../envs/entrez_direct_utils.yaml"
     shell: """
-    prefetch --max-size {params.max_size} {params.run}
+    prefetch --max-size {params.max_size} {params.run} 2>&1 > {log}
     """
 
 rule get_file:
     """
     Download the file and check the MD5sum
     """
-    ## output: temp(config["out_dir"] + "/data/samples/{dataset}/{sample}/files/{run}/{filename}")
-    output: config["out_dir"] + "/data/samples/{dataset}/{sample}/files/{run}/{filename}"
+    output: "./data/samples/{dataset}/{sample}/files/{run}/{filename}"
     conda: "../../envs/define_technology.yaml"
-    log: config['logs_dir'] + "/{dataset}/{sample}/{run}/{filename}_get_file.log"
-    benchmark: config['logs_dir'] + "/{dataset}/{sample}/{run}/{filename}_get_file.benchmark"
-    params: url=get_url, md5=get_md5sum, work_dir=config["out_dir"] + "/data/samples/{dataset}/{sample}/files/{run}", filename="{filename}"
+    log: "./logs/{dataset}/{sample}/{run}/{filename}_get_file.log"
+    benchmark: "./logs/{dataset}/{sample}/{run}/{filename}_get_file.benchmark"
+    params:
+        url=dispatcher.get_file_url,
+        md5=dispatcher.get_file_md5,
+        work_dir=lambda wildcards, output: os.path.split(output[0])[0],
+        filename="{filename}"
     resources:
         mem_mb=4000
     shell: """
@@ -44,21 +43,21 @@ rule get_file:
 
 use rule get_file as get_fastq_ftp with:
     params:
-        url = get_url,
-        md5 = get_md5sum,
+        url = dispatcher.get_file_url,
+        md5 = dispatcher.get_file_md5,
         filename="{filename}",
-        work_dir=config["out_dir"] + "/data/samples/{dataset}/{sample}/files/{run}/fastq"
+        work_dir=lambda wildcards, output: os.path.split(output[0])[0]
     output:
-        temp(config["out_dir"] + "/data/samples/{dataset}/{sample}/files/{run}/fastq/{filename}")
+        temp("./data/samples/{dataset}/{sample}/files/{run}/fastq/{filename}")
 
 use rule get_file as get_bam_ftp with:
     params:
-        url = get_url,
-        md5 = get_md5sum,
+        url = dispatcher.get_file_url,
+        md5 = dispatcher.get_file_md5,
         filename = "{filename}",
-        work_dir=config["out_dir"] + "/data/samples/{dataset}/{sample}/files/{run}/bam"
+        work_dir=lambda wildcards, output: os.path.split(output[0])[0]
     output:
-        temp(config["out_dir"] + "/data/samples/{dataset}/{sample}/files/{run}/bam/{filename}")
+        temp("./data/samples/{dataset}/{sample}/files/{run}/bam/{filename}")
 
 
 rule get_fastq_dump_files:
@@ -66,22 +65,24 @@ rule get_fastq_dump_files:
         sra=rules.ncbi_prefetch.output.sra
     output:
         outs=[
-            temp(config["out_dir"] + "/data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_1.fastq.gz"),
-            temp(config["out_dir"] + "/data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_2.fastq.gz"),
-            temp(config["out_dir"] + "/data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_3.fastq.gz"),
-            temp(config["out_dir"] + "/data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_4.fastq.gz")
+            temp("./data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_1.fastq.gz"),
+            temp("./data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_2.fastq.gz"),
+            temp("./data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_3.fastq.gz"),
+            temp("./data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_4.fastq.gz")
         ]
     conda: "../../envs/entrez_direct_utils.yaml"
     params:
         sra='{run}',
-        work_dir=config["out_dir"] + "/data/samples/{dataset}/{sample}/files/{run}/fastq_dump"
+        work_dir=lambda wildcards, output: os.path.split(output.outs[0])[0]
     threads: 4
+    log: "./logs/{dataset}/{sample}/{run}/get_fastq_dump_files.log"
+    benchmark: "./logs/{dataset}/{sample}/{run}/get_fastq_dump_files.benchmark"
     resources:
         mem_mb=8000
     shell:
         """
         mkdir -p {params.work_dir}
         cd {params.work_dir}
-        parallel-fastq-dump -s {input.sra} --split-files --threads {threads} --outdir {params.work_dir:q} --tmpdir . --gzip
+        parallel-fastq-dump -s {input.sra} --split-files --threads {threads} --outdir {params.work_dir:q} --tmpdir . --gzip 2>&1 > {log}
         touch {output.outs}
         """

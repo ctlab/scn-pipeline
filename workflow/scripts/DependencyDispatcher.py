@@ -155,3 +155,32 @@ class DependencyDispatcher(object):
             for run in runs if run.get_bam() is not None
         ]
         return bam
+
+    @if_empty_return([])
+    def get_seurat_objects(self, wildcards: Wildcards) -> List[str]:
+        samples = self.get_sample_names(wildcards)
+
+        return [
+            f"./data/samples/{wildcards.get('dataset')}/{sample}/seurat.rds" for sample in samples
+        ]
+
+    @if_empty_return([])
+    def get_seurat_objects_forced(self, wildcards: Wildcards) -> List[str]:
+        return [file for file in self.get_seurat_objects(wildcards) if os.path.exists(file)]
+
+    @if_empty_return(None)
+    def get_file(self, wildcards: Wildcards) -> FFQFile:
+        files = self.get_run(wildcards).files
+        filename = wildcards.get("filename")
+        file = [file for file in files if file.filename == filename][0]
+        return file
+
+    @if_empty_return(None)
+    def get_file_url(self, wildcards: Wildcards) -> str:
+        file = self.get_file(wildcards)
+        return file.url
+
+    @if_empty_return(None)
+    def get_file_md5(self, wildcards: Wildcards) -> str:
+        file = self.get_file(wildcards)
+        return file.md5

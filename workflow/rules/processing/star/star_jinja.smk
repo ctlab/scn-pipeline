@@ -1,9 +1,9 @@
 from workflow.scripts.DependencyDispatcher import DependencyDispatcher
-
+from pathlib import Path
 dispatcher = DependencyDispatcher(config)
 
 rule render_star_script:
-  input: config["templates"] + "/star.bash"
+  input: Path(config["templates"], "star.bash")
   params:
     idx=dispatcher.star_index,
     barcode=dispatcher.get_barcode_reads,
@@ -15,12 +15,12 @@ rule render_star_script:
     processing_mode=dispatcher.get_processing_mode,
     whitelist=dispatcher.get_whitelist,
     threads=4,
-    out_dir=config["out_dir"] + "/data/samples/{dataset}/{sample}/star/solo/"
-  output: config["out_dir"] + "/data/samples/{dataset}/{sample}/star/star.bash"
+    out_dir="./data/samples/{dataset}/{sample}/star/solo/"
+  output: "./data/samples/{dataset}/{sample}/star/star.bash"
   threads: 1
   resources:
     mem_mb=4000
-  benchmark: config['logs_dir'] + "/{dataset}/{sample}/kallisto/render_star_script.benchmark"
-  log: config['logs_dir'] + "/{dataset}/{sample}/kallisto/render_star_script.log"
+  benchmark: "./logs/{dataset}/{sample}/kallisto/render_star_script.benchmark"
+  log: "./logs/{dataset}/{sample}/kallisto/render_star_script.log"
   conda: "../../../envs/jinja.yaml"
   script: "../../../scripts/RenderJinja.py"
