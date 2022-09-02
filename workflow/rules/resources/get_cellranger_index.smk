@@ -12,27 +12,27 @@ FASTA_DIR_NAMES = {
 
 rule get_cellranger_fasta:
     output:
-        reference_json = "./resources/cellranger/{species}/reference.json",
-        fasta="./resources/cellranger/{species}/fasta/genome.fa",
-        fasta_index="./resources/cellranger/{species}/fasta/genome.fa.fai",
-        gtf="./resources/cellranger/{species}/genes/genes.gtf",
-        pickle="./resources/cellranger/{species}/pickle/genes.pickle",
-        star_chr_length="./resources/cellranger/{species}/star/chrLength.txt",
-        star_chr_name_length="./resources/cellranger/{species}/star/chrNameLength.txt",
-        star_chr_name="./resources/cellranger/{species}/star/chrName.txt",
-        star_chr_start="./resources/cellranger/{species}/star/chrStart.txt",
-        star_exon_ge_tr_info="./resources/cellranger/{species}/star/exonGeTrInfo.tab",
-        star_exon_info="./resources/cellranger/{species}/star/exonInfo.tab",
-        star_gene_info="./resources/cellranger/{species}/star/geneInfo.tab",
-        star_genome="./resources/cellranger/{species}/star/Genome",
-        star_genome_parameters="./resources/cellranger/{species}/star/genomeParameters.txt",
-        star_sa="./resources/cellranger/{species}/star/SA",
-        star_sa_index="./resources/cellranger/{species}/star/SAindex",
-        star_sjdb_info="./resources/cellranger/{species}/star/sjdbInfo.txt",
-        star_sjdb_list_from_gtf_out="./resources/cellranger/{species}/star/sjdbList.fromGTF.out.tab",
-        star_sjdb_list_out="./resources/cellranger/{species}/star/sjdbList.out.tab",
-        star_transcript_info="./resources/cellranger/{species}/star/transcriptInfo.tab",
-        tmp_tar_gz=temp("./resources/{species}.tar.gz")
+        reference_json = "resources/cellranger/{species}/reference.json",
+        fasta="resources/cellranger/{species}/fasta/genome.fa",
+        fasta_index="resources/cellranger/{species}/fasta/genome.fa.fai",
+        gtf="resources/cellranger/{species}/genes/genes.gtf",
+        pickle="resources/cellranger/{species}/pickle/genes.pickle",
+        star_chr_length="resources/cellranger/{species}/star/chrLength.txt",
+        star_chr_name_length="resources/cellranger/{species}/star/chrNameLength.txt",
+        star_chr_name="resources/cellranger/{species}/star/chrName.txt",
+        star_chr_start="resources/cellranger/{species}/star/chrStart.txt",
+        star_exon_ge_tr_info="resources/cellranger/{species}/star/exonGeTrInfo.tab",
+        star_exon_info="resources/cellranger/{species}/star/exonInfo.tab",
+        star_gene_info="resources/cellranger/{species}/star/geneInfo.tab",
+        star_genome="resources/cellranger/{species}/star/Genome",
+        star_genome_parameters="resources/cellranger/{species}/star/genomeParameters.txt",
+        star_sa="resources/cellranger/{species}/star/SA",
+        star_sa_index="resources/cellranger/{species}/star/SAindex",
+        star_sjdb_info="resources/cellranger/{species}/star/sjdbInfo.txt",
+        star_sjdb_list_from_gtf_out="resources/cellranger/{species}/star/sjdbList.fromGTF.out.tab",
+        star_sjdb_list_out="resources/cellranger/{species}/star/sjdbList.out.tab",
+        star_transcript_info="resources/cellranger/{species}/star/transcriptInfo.tab",
+        tmp_tar_gz=temp("resources/{species}.tar.gz")
     params:
         link=lambda wildcards: FASTA_TAR_NAMES[wildcards.species],
         dir_name=lambda wildcards: FASTA_DIR_NAMES[wildcards.species],
@@ -40,8 +40,8 @@ rule get_cellranger_fasta:
         out_dir=lambda wildcards, output: os.path.split(output.reference_json)[0],
         species="{species}"
     conda: "../../envs/git.yaml"
-    log: "./logs/resources/get_cellranger_fasta_{species}.log"
-    benchmark: "./logs/resources/get_cellranger_fasta_{species}.benchmark"
+    log: "logs/resources/get_cellranger_fasta_{species}.log"
+    benchmark: "logs/resources/get_cellranger_fasta_{species}.benchmark"
     shell:
         """
         cd {params.resource_dir}

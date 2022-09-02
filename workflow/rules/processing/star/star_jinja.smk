@@ -15,12 +15,12 @@ rule render_star_script:
     processing_mode=dispatcher.get_processing_mode,
     whitelist=dispatcher.get_whitelist,
     threads=4,
-    out_dir="./data/samples/{dataset}/{sample}/star/solo/"
-  output: "./data/samples/{dataset}/{sample}/star/star.bash"
+    out_dir="data/samples/{dataset}/{sample}/star/solo/"
+  output: "data/samples/{dataset}/{sample}/star/star.bash"
   threads: 1
   resources:
     mem_mb=4000
-  benchmark: "./logs/{dataset}/{sample}/kallisto/render_star_script.benchmark"
-  log: "./logs/{dataset}/{sample}/kallisto/render_star_script.log"
+  benchmark: "logs/{dataset}/{sample}/kallisto/render_star_script.benchmark"
+  log: "logs/{dataset}/{sample}/kallisto/render_star_script.log"
   conda: "../../../envs/jinja.yaml"
   script: "../../../scripts/RenderJinja.py"

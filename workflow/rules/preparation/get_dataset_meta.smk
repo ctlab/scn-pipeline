@@ -1,7 +1,7 @@
 
 rule get_meta_single:
     params: dataset="{dataset}"
-    output: ffq_json="./meta/{dataset}/ffq_raw.json",
+    output: ffq_json="meta/{dataset}/ffq_raw.json",
     log: ".logs/{dataset}/ffq.log"
     benchmark: ".logs/{dataset}/ffq.benchmark"
     resources:

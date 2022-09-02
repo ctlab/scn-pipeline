@@ -11,8 +11,8 @@ rule ncbi_prefetch:
     params:
         run="{run}",
         max_size="100g"
-    log: "./logs/{run}/ncbi_prefetch.log"
-    benchmark: "./logs/{run}/ncbi_prefetchbenchmark"
+    log: "logs/{run}/ncbi_prefetch.log"
+    benchmark: "logs/{run}/ncbi_prefetchbenchmark"
     conda: "../../envs/entrez_direct_utils.yaml"
     shell: """
     prefetch --max-size {params.max_size} {params.run} 2>&1 > {log}
@@ -22,10 +22,10 @@ rule get_file:
     """
     Download the file and check the MD5sum
     """
-    output: "./data/samples/{dataset}/{sample}/files/{run}/{filename}"
+    output: "data/samples/{dataset}/{sample}/files/{run}/{filename}"
     conda: "../../envs/define_technology.yaml"
-    log: "./logs/{dataset}/{sample}/{run}/{filename}_get_file.log"
-    benchmark: "./logs/{dataset}/{sample}/{run}/{filename}_get_file.benchmark"
+    log: "logs/{dataset}/{sample}/{run}/{filename}_get_file.log"
+    benchmark: "logs/{dataset}/{sample}/{run}/{filename}_get_file.benchmark"
     params:
         url=dispatcher.get_file_url,
         md5=dispatcher.get_file_md5,
@@ -48,7 +48,7 @@ use rule get_file as get_fastq_ftp with:
         filename="{filename}",
         work_dir=lambda wildcards, output: os.path.split(output[0])[0]
     output:
-        temp("./data/samples/{dataset}/{sample}/files/{run}/fastq/{filename}")
+        temp("data/samples/{dataset}/{sample}/files/{run}/fastq/{filename}")
 
 use rule get_file as get_bam_ftp with:
     params:
@@ -57,7 +57,7 @@ use rule get_file as get_bam_ftp with:
         filename = "{filename}",
         work_dir=lambda wildcards, output: os.path.split(output[0])[0]
     output:
-        temp("./data/samples/{dataset}/{sample}/files/{run}/bam/{filename}")
+        temp("data/samples/{dataset}/{sample}/files/{run}/bam/{filename}")
 
 
 rule get_fastq_dump_files:
@@ -65,18 +65,18 @@ rule get_fastq_dump_files:
         sra=rules.ncbi_prefetch.output.sra
     output:
         outs=[
-            temp("./data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_1.fastq.gz"),
-            temp("./data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_2.fastq.gz"),
-            temp("./data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_3.fastq.gz"),
-            temp("./data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_4.fastq.gz")
+            temp("data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_1.fastq.gz"),
+            temp("data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_2.fastq.gz"),
+            temp("data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_3.fastq.gz"),
+            temp("data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_4.fastq.gz")
         ]
     conda: "../../envs/entrez_direct_utils.yaml"
     params:
         sra='{run}',
         work_dir=lambda wildcards, output: os.path.split(output.outs[0])[0]
     threads: 4
-    log: "./logs/{dataset}/{sample}/{run}/get_fastq_dump_files.log"
-    benchmark: "./logs/{dataset}/{sample}/{run}/get_fastq_dump_files.benchmark"
+    log: "logs/{dataset}/{sample}/{run}/get_fastq_dump_files.log"
+    benchmark: "logs/{dataset}/{sample}/{run}/get_fastq_dump_files.benchmark"
     resources:
         mem_mb=8000
     shell:
