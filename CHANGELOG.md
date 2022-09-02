@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/ctlab/scn-pipeline/compare/v1.0.0...v1.0.1) (2022-09-02)
+
+
+### Bug Fixes
+
+* now ncbi_prefetch is now required for define_tech since, prefetch is now required for parallel-fastq-dump with small enough X, fixes [#2](https://github.com/ctlab/scn-pipeline/issues/2) ([fe24d74](https://github.com/ctlab/scn-pipeline/commit/fe24d74868e5521561992ebbb7c5f405a5a971c4))
+
 ## 1.0.0 (2022-09-01)
 
 Releasing the scn-pipeline v.1.0.0
