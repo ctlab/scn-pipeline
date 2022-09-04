@@ -35,9 +35,9 @@ rule get_file:
         mem_mb=4000
     shell: """
     mkdir -p {params.work_dir}
+    wget -q -O {output:q} {params.url:q} 2> {log}
     cd {params.work_dir}
     echo "{params.md5}  {params.filename}" > {params.filename}.md5sum
-    wget -q -O {output:q} {params.url:q} 2> {log}
     md5sum -c {params.filename}.md5sum
     """
 

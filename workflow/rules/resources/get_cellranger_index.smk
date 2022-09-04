@@ -44,9 +44,9 @@ rule get_cellranger_fasta:
     benchmark: "logs/resources/get_cellranger_fasta_{species}.benchmark"
     shell:
         """
-        cd {params.resource_dir}
         wget -o {log} -O {output.tmp_tar_gz} {params.link}
-        tar -xzf {output.tmp_tar_gz} 2> {log}
+        cd {params.resource_dir}
+        tar -xzf {output.tmp_tar_gz}
         rm -rf {params.out_dir}
         mv {params.dir_name} {params.out_dir}
         """
