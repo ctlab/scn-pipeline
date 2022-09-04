@@ -11,8 +11,8 @@ rule define_tech:
         dataset="{dataset}",
         header_dir="meta/{dataset}/headers/",
         ncbi_dir=config['ncbi_dir']
-    log: ".logs/{dataset}/define_technology.log"
-    benchmark: ".logs/{dataset}/define_technology.benchmark"
+    log: "logs/{dataset}/define_technology.log"
+    benchmark: "logs/{dataset}/define_technology.benchmark"
     threads: 4
     resources:
         mem_mb=8000
