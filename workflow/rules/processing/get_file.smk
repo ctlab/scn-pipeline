@@ -82,7 +82,6 @@ rule get_fastq_dump_files:
     shell:
         """
         mkdir -p {params.work_dir}
-        cd {params.work_dir}
-        parallel-fastq-dump -s {input.sra} --split-files --threads {threads} --outdir {params.work_dir:q} --tmpdir . --gzip 2>&1 > {log}
+        parallel-fastq-dump -s {input.sra} --split-files --threads {threads} --outdir {params.work_dir:q} --tmpdir {params.work_dir} --gzip 2>&1 > {log}
         touch {output.outs}
         """
