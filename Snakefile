@@ -5,11 +5,11 @@ import os
 min_version("7.0")
 configfile: "configs/config.yaml"
 
-config["datasets"] = config.get("datasets", os.path.join(os.getcwd(), "configs", "datasets.json"))
-config["templates"] = config.get("templates", os.path.join(os.getcwd(), "workflow", "templates"))
-config["samples"] = config.get("samples", os.path.join(config["out_dir"], "sample_description.json"))
-config["resources"] = config.get("resources", os.path.join(config["out_dir"], "resources"))
-config["logs_dir"] = config.get("logs_dir", os.path.join(config["out_dir"], "logs"))
+config["datasets"] = os.path.join(os.getcwd(), "configs", "datasets.json")
+config["templates"] = os.path.join(os.getcwd(), "workflow", "templates")
+config["samples"] = os.path.join(config["out_dir"], "sample_description.json")
+config["resources"] = os.path.join(config["out_dir"], "resources")
+config["logs_dir"] = os.path.join(config["out_dir"], "logs")
 
 
 include: "workflow/rules/resources/get_all_resources.smk"
