@@ -90,7 +90,7 @@ class DependencyDispatcher(object):
     @if_empty_return(None)
     def star_index(self, wildcards: Wildcards) -> str:
         species = self.get_species(wildcards)
-        return "resources/star/{species}/SA"
+        return f"resources/star/{species}/SA"
 
     @if_empty_return(None)
     def get_technology(self, wildcards: Wildcards) -> str:
