@@ -90,7 +90,7 @@ class DependencyDispatcher(object):
     @if_empty_return(None)
     def star_index(self, wildcards: Wildcards) -> str:
         species = self.get_species(wildcards)
-        return self.resources + f"/star/{species}/SA"
+        return "resources/star/{species}/SA"
 
     @if_empty_return(None)
     def get_technology(self, wildcards: Wildcards) -> str:
@@ -117,8 +117,7 @@ class DependencyDispatcher(object):
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         barcodes = [
-            run.get_barcode_read().get_path(self.out_dir +
-                                            f"/data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
+            run.get_barcode_read().get_path(f"data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
             for run in runs if run.get_barcode_read() is not None
         ]
         return barcodes
@@ -128,8 +127,7 @@ class DependencyDispatcher(object):
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         cdna = [
-            run.get_cdna_read().get_path(self.out_dir +
-                                         f"/data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
+            run.get_cdna_read().get_path(f"data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
             for run in runs if run.get_cdna_read() is not None
         ]
         return cdna
@@ -139,8 +137,7 @@ class DependencyDispatcher(object):
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         index = [
-            run.get_index_read().get_path(self.out_dir +
-                                          f"/data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
+            run.get_index_read().get_path(f"data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
             for run in runs if run.get_index_read() is not None
         ]
         return index
@@ -150,8 +147,7 @@ class DependencyDispatcher(object):
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         bam = [
-            run.get_bam().get_path(self.out_dir +
-                                   f"/data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
+            run.get_bam().get_path(f"data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
             for run in runs if run.get_bam() is not None
         ]
         return bam
@@ -161,7 +157,7 @@ class DependencyDispatcher(object):
         samples = self.get_sample_names(wildcards)
 
         return [
-            f"./data/samples/{wildcards.get('dataset')}/{sample}/seurat.rds" for sample in samples
+            f"data/samples/{wildcards.get('dataset')}/{sample}/seurat.rds" for sample in samples
         ]
 
     @if_empty_return([])
