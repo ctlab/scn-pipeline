@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/ctlab/scn-pipeline/compare/v1.0.1...v1.0.2) (2022-09-20)
+
+
+### Bug Fixes
+
+* fixes to documentation to make it more transparent ([18c3e0e](https://github.com/ctlab/scn-pipeline/commit/18c3e0e0901bbdc43d196b151f8297db249b8fac))
+
 ## [1.0.1](https://github.com/ctlab/scn-pipeline/compare/v1.0.0...v1.0.1) (2022-09-02)
 
 
