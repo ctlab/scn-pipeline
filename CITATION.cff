@@ -1,9 +1,13 @@
-@software{scn-pipeline,
-  author = {Zaitsev, Konstantin and Firulyova, Maria},
-  doi = {10.5281/zenodo.7096897},
-  month = {9},
-  title = {{scNavigator pipeline}},
-  url = {https://github.com/ctlab/scn-pipeline},
-  version = {1.0.2},
-  year = {2022}
-}
+cff-version: 1.2.0
+message: "If you use this software, consider citing this as below."
+authors:
+- family-names: "Zaitsev"
+  given-names: "Konstantin"
+  orcid: "https://orcid.org/0000-0003-3749-0886"
+- family-names: "Firulyova"
+  given-names: "Maria"
+title: "scNavigator pipeline"
+version: 1.0.2
+doi: 10.5281/zenodo.7096897
+date-released: 2022-09-20
+url: "https://github.com/ctlab/scn-pipeline"
