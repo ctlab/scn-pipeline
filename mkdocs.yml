@@ -1,8 +1,12 @@
 site_name: scNavigator pipeline documentation
 site_url: https://scn-pipeline.readthedocs.io/
 nav:
-    - Home: index.md
-    - Overview: [overview.md, dependency_dispatcher.md, meta.md, processing.md, analysis.md]
+    - Getting started: index.md
+    - overview.md
+    - dependency_dispatcher.md
+    - meta.md
+    - processing.md
+    - analysis.md
 theme: material
 markdown_extensions:
   - pymdownx.highlight:
