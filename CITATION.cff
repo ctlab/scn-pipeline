@@ -1,0 +1,9 @@
+@software{scn-pipeline,
+  author = {Zaitsev, Konstantin and Firulyova, Maria},
+  doi = {10.5281/zenodo.7096897},
+  month = {9},
+  title = {{scNavigator pipeline}},
+  url = {https://github.com/ctlab/scn-pipeline},
+  version = {1.0.2},
+  year = {2022}
+}
