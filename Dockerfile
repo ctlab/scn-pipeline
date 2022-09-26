@@ -154,13 +154,13 @@ RUN mamba install -c conda-forge -c bioconda -n base snakemake
 
 # Step 3: Generate conda environments
 
-RUN mamba create -n define_technology --file /conda-envs/define_technology/environment.yaml && \
-    mamba create -n entrez_direct_utils --file /conda-envs/entrez_direct_utils/environment.yaml && \
-    mamba create -n ffq --file /conda-envs/ffq/environment.yaml && \
-    mamba create -n filtering_counts --file /conda-envs/filtering_counts/environment.yaml && \
-    mamba create -n git --file /conda-envs/git/environment.yaml && \
-    mamba create -n jinja --file /conda-envs/jinja/environment.yaml && \
-    mamba create -n jq --file /conda-envs/jq/environment.yaml && \
-    mamba create -n seurat_analysis --file /conda-envs/seurat_analysis/environment.yaml && \
-    mamba create -n star --file /conda-envs/star/environment.yaml && \
+RUN mamba env create -n define_technology --file /conda-envs/define_technology/environment.yaml && \
+    mamba env create -n entrez_direct_utils --file /conda-envs/entrez_direct_utils/environment.yaml && \
+    mamba env create -n ffq --file /conda-envs/ffq/environment.yaml && \
+    mamba env create -n filtering_counts --file /conda-envs/filtering_counts/environment.yaml && \
+    mamba env create -n git --file /conda-envs/git/environment.yaml && \
+    mamba env create -n jinja --file /conda-envs/jinja/environment.yaml && \
+    mamba env create -n jq --file /conda-envs/jq/environment.yaml && \
+    mamba env create -n seurat_analysis --file /conda-envs/seurat_analysis/environment.yaml && \
+    mamba env create -n star --file /conda-envs/star/environment.yaml && \
     mamba clean --all -y
