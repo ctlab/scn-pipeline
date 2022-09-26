@@ -1,4 +1,4 @@
-name: r-seurat-analysis
+name: seurat_analysis
 channels:
  - conda-forge
 dependencies:

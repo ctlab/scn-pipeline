@@ -39,7 +39,7 @@ rule get_cellranger_fasta:
         resource_dir=lambda wildcards, output: os.path.split(output.tmp_tar_gz)[0],
         out_dir=lambda wildcards, output: os.path.split(output.reference_json)[0],
         species="{species}"
-    conda: "../../envs/git.yaml"
+    conda: "git"
     log: "logs/resources/get_cellranger_fasta_{species}.log"
     benchmark: "logs/resources/get_cellranger_fasta_{species}.benchmark"
     shell:

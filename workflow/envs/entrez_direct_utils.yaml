@@ -1,4 +1,4 @@
-name: entrez-direct-utils
+name: entrez_direct_utils
 channels:
  - bioconda
  - conda-forge

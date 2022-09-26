@@ -30,7 +30,7 @@ rule markers:
         mem_mb=16000
     log: "logs/{dataset}/{sample}/markers.log"
     benchmark: "logs/{dataset}/{sample}/markers.benchmark"
-    conda: "../../envs/seurat_analysis.yaml"
+    conda: "seurat_analysis"
     script: "../../scripts/markers.R"
 
 use rule markers as markers_merged with:

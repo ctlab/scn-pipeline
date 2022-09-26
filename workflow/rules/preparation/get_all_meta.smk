@@ -9,7 +9,7 @@ rule get_all_meta:
   input: expand(rules.define_tech.output.ffq_full, dataset=DATASETS)
   output: config['samples']
   log: "logs/concatenate_sample_descriptions.log"
-  conda: "../../envs/jq.yaml"
+  conda: "jq"
   resources:
     mem_mb=2000
   shell: """

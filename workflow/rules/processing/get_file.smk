@@ -13,7 +13,7 @@ rule ncbi_prefetch:
         max_size="100g"
     log: "logs/{run}/ncbi_prefetch.log"
     benchmark: "logs/{run}/ncbi_prefetchbenchmark"
-    conda: "../../envs/entrez_direct_utils.yaml"
+    conda: "entrez_direct_utils"
     shell: """
     prefetch --max-size {params.max_size} {params.run} 2>&1 > {log}
     """
@@ -23,7 +23,7 @@ rule get_file:
     Download the file and check the MD5sum
     """
     output: "data/samples/{dataset}/{sample}/files/{run}/{filename}"
-    conda: "../../envs/define_technology.yaml"
+    conda: "define_technology"
     log: "logs/{dataset}/{sample}/{run}/{filename}_get_file.log"
     benchmark: "logs/{dataset}/{sample}/{run}/{filename}_get_file.benchmark"
     params:
@@ -70,7 +70,7 @@ rule get_fastq_dump_files:
             temp("data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_3.fastq.gz"),
             temp("data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_4.fastq.gz")
         ]
-    conda: "../../envs/entrez_direct_utils.yaml"
+    conda: "entrez_direct_utils"
     params:
         sra='{run}',
         work_dir=lambda wildcards, output: os.path.split(output.outs[0])[0]

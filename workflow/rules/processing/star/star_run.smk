@@ -31,7 +31,7 @@ rule run_star:
     threads: 4
     log: "logs/{dataset}/{sample}/star/run_star.log"
     benchmark: "logs/{dataset}/{sample}/star/run_star.benchmark"
-    conda: "../../../envs/star.yaml"
+    conda: "star"
     shell: """
     # exec > {log} 2>&1
     bash {input.star_script:q}

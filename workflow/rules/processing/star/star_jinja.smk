@@ -22,5 +22,5 @@ rule render_star_script:
     mem_mb=4000
   benchmark: "logs/{dataset}/{sample}/kallisto/render_star_script.benchmark"
   log: "logs/{dataset}/{sample}/kallisto/render_star_script.log"
-  conda: "../../../envs/jinja.yaml"
+  conda: "jinja"
   script: "../../../scripts/RenderJinja.py"

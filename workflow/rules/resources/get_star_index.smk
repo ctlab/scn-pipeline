@@ -29,7 +29,7 @@ rule get_star_index:
         mem_mb=64000
     log: "logs/resources/get_alevin_index_{species}.log"
     benchmark: "logs/resources/get_alevin_index_{species}.benchmark"
-    conda: "../../envs/star.yaml"
+    conda: "star"
     shell: """
     
     STAR  --runMode genomeGenerate --runThreadN {threads} --genomeDir {params.out_dir} --genomeFastaFiles {input.fasta} --sjdbGTFfile {input.gtf} 2> {log}

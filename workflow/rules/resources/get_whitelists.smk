@@ -3,7 +3,7 @@ rule get_whitelists:
         whitelist_10x_v1 = "resources/10xv1_whitelist.txt",
         whitelist_10x_v2 = "resources/10xv2_whitelist.txt",
         whitelist_10x_v3 = "resources/10xv3_whitelist.txt"
-    conda: "../../envs/git.yaml"
+    conda: "git"
     log: "logs/resources/get_whitelists.log"
     benchmark: "logs/resources/get_whitelists.benchmark"
     shell: """

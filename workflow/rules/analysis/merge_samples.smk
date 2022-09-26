@@ -22,7 +22,7 @@ rule merge_samples:
         mem_mb=64000
     log: "logs/{dataset}/merge_samples.log"
     benchmark: "logs/{dataset}/merge_samples.benchmark"
-    conda: "../../envs/seurat_analysis.yaml"
+    conda: "seurat_analysis"
     script: "../../scripts/merge.R"
 
 use rule merge_samples as merge_samples_forced with:

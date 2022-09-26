@@ -12,5 +12,5 @@ rule filter_counts_star:
         mem_mb=16000
     log: "logs/{dataset}/{sample}/star/filter_counts.log"
     benchmark: "logs/{dataset}/{sample}/star/filter_counts.benchmark"
-    conda: "../../../envs/filtering_counts.yaml"
+    conda: "filtering_counts"
     script: "filter_counts.R"

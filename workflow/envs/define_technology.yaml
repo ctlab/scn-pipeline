@@ -1,4 +1,4 @@
-name: python-define-technology
+name: define_technology
 channels:
  - bioconda
  - conda-forge

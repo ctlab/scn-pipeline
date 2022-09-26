@@ -32,5 +32,5 @@ rule seurat_analysis:
         mem_mb=16000
     log: "logs/{dataset}/{sample}/seurat_analysis.log"
     benchmark: "logs/{dataset}/{sample}/seurat_analysis.benchmark"
-    conda: "../../envs/seurat_analysis.yaml"
+    conda: "seurat_analysis"
     script: "../../scripts/seurat_analysis.R"

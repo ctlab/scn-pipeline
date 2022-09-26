@@ -16,5 +16,5 @@ rule define_tech:
     threads: 4
     resources:
         mem_mb=8000
-    conda: "../../envs/define_technology.yaml"
+    conda: "define_technology"
     script: "../../scripts/DefineTechnology.py"

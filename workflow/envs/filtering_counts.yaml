@@ -1,4 +1,4 @@
-name: r-filtering-counts
+name: filtering_counts
 channels:
  - conda-forge
  - bioconda
