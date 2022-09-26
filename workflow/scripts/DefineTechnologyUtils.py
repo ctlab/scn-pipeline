@@ -109,7 +109,7 @@ def get_geo_ids(start_date: str, end_date: str, org: str) -> list:
     gds_pattern = re.compile(r'^200')
     gse_ids = list()
     for elem in gds_tree.findall('IdList/Id'):
-        gse_ids.append(gds_pattern.sub('https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE', elem.text))
+        gse_ids.append(gds_pattern.sub('GSE', elem.text))
     return gse_ids
 
 
