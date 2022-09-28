@@ -46,5 +46,5 @@ rule get_cellranger_fasta:
         wget -o {log} -O {output.tmp_tar_gz} {params.link}
         tar -xzf {output.tmp_tar_gz} -C {params.resource_dir}
         rm -rf {params.out_dir}
-        mv {params.dir_name} {params.out_dir}
+        mv {params.resource_dir}/{params.dir_name} {params.out_dir}
         """
