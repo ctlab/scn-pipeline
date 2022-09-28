@@ -37,6 +37,7 @@ rule get_cellranger_fasta:
         link=lambda wildcards: FASTA_TAR_NAMES[wildcards.species],
         dir_name=lambda wildcards: FASTA_DIR_NAMES[wildcards.species],
         resource_dir=lambda wildcards, output: os.path.split(output.tmp_tar_gz)[0],
+        tar_gz=lambda wildcards, output: os.path.split(output.tmp_tar_gz)[-1],
         out_dir=lambda wildcards, output: os.path.split(output.reference_json)[0],
         species="{species}"
     conda: "../../envs/git.yaml"
@@ -46,7 +47,7 @@ rule get_cellranger_fasta:
         """
         wget -o {log} -O {output.tmp_tar_gz} {params.link}
         cd {params.resource_dir}
-        tar -xzf {output.tmp_tar_gz}
+        tar -xzf {params.tar_gz}
         rm -rf {params.out_dir}
         mv {params.dir_name} {params.out_dir}
         """
