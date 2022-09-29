@@ -1,3 +1,4 @@
+import logging
 import re
 import subprocess
 import time
@@ -40,6 +41,7 @@ def extract_table(start_date: str, end_date: str) -> pd.DataFrame:
     df = df[after_start_date & before_end_date]
     df = df[['Accession', 'Organism', 'Processed Data', 'Raw Data', 'ArrayExpress URL', 'Release Date']]
     return df
+
 
 def parse_table(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -93,6 +95,7 @@ def save_results(df: pd.DataFrame, start_date: str, end_date: str) -> None:
                                                   index=False)
     df.loc[df['technology'].isnull()].to_csv(f'result/{start_date}_{end_date}/per_tech/unknown.csv', sep='\t',
                                              index=False)
+
 
 def get_geo_ids(start_date: str, end_date: str, org: str) -> list:
     """
@@ -246,9 +249,74 @@ def url_open(url, timeout=2, n_trials=5, sleep_time=2):
     raise latest_exception
 
 
+def get_from_entrez(accession: str, db: str, rettype: str) -> str:
+    command = ["efetch", "-db", db, "-id", accession, "-format", rettype]
+    logging.warning(command)
+    output = subprocess.check_output(command)
+    return output.decode("utf-8")
+
+
 def get_xml_from_entrez(accession: str) -> str:
-    xml_output = subprocess.check_output(["efetch", "-db", "sra", "-id", accession, "-format", "xml" ])
-    return xml_output
+    return get_from_entrez(accession, "sra", "xml")
+
+
+def get_gse_meta(accession) -> str:
+    return get_from_entrez(accession, "gds", "summary")
+
+
+def parse_gse_meta(accession: str):
+    meta = get_gse_meta(accession)
+    result = {
+        'accession': accession,
+        'experiments': {}
+    }
+
+    super_ser = re.findall('This SuperSeries is composed', meta)
+    result['super_series'] = True if super_ser else False
+    if super_ser:
+        return result
+
+    experiments = re.findall(r'SRX\d+', meta)
+
+    for experiment in experiments:
+        result['experiments'][experiment] = get_tech_from_srx(experiment)
+
+    return result
+
+
+def get_tech_from_srx(srr_accession):
+    result = {
+        'accession': srr_accession,
+        'alias': "",
+        'error': "",
+        'transcriptomic': False,
+        'technology': [],
+        'taxon_id': 0
+    }
+    xml_content = get_xml_from_entrez(srr_accession)
+    tree = ET.fromstring(xml_content)
+    error = tree.find("ERROR")
+
+    if error is not None:
+        result['error'] = error.text
+        return result
+
+    result['alias'] = tree.find("EXPERIMENT_PACKAGE").find("EXPERIMENT").attrib["alias"]
+    result['taxon_id'] = int(
+        tree.find("EXPERIMENT_PACKAGE")
+            .find("SAMPLE")
+            .find("SAMPLE_NAME")
+            .find("TAXON_ID").text
+    )
+    if not is_rna_seq(tree):
+        return result
+    else:
+        result['transcriptomic'] = True
+        package = tree.find('EXPERIMENT_PACKAGE')
+        seen_patterns = find_patterns(package)
+        tech_pattern = get_tech(','.join(seen_patterns))
+        result['technology'] = tech_pattern
+        return result
 
 
 def parse_srs_for_tech(srr_accession):
