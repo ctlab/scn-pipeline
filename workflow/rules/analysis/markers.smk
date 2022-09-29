@@ -10,7 +10,6 @@ rule markers:
     input:
         seurat = rules.seurat_analysis.output.seurat
     output:
-        marker_dir = directory("data/samples/{dataset}/{sample}/markers"),
         markers = [
             f"data/samples/{{dataset}}/{{sample}}/markers/markers_{resolution}.tsv"
             for resolution in RESOLUTIONS
@@ -37,7 +36,6 @@ use rule markers as markers_merged with:
     input:
         seurat = rules.merge_samples.output.seurat
     output:
-        marker_dir = directory("data/datasets/{dataset}/markers"),
         markers=[
             f"data/datasets/{{dataset}}/markers/markers_{resolution}.tsv"
             for resolution in RESOLUTIONS

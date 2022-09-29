@@ -2,9 +2,6 @@ library(ggplot2)
 library(Seurat)
 
 data <- readRDS(snakemake@input$seurat)
-outputMarkerDir <- snakemake@output$marker_dir
-dir.create(outputMarkerDir, recursive = T)
-
 
 DefaultAssay(data) <- "RNA"
 data <- NormalizeData(data)
@@ -56,19 +53,20 @@ allMarkers <- function(seurat,
 
 
 
-for (resolution in snakemake@params$resolutions) {
+for (index in 1:length(snakemake@params$resolutions)) {
 
+  resolution <- snakemake@params$resolutions[index]
   identName <- paste0('SCT_snn_res.', resolution)
 
   clusterAverages <- averageExpression(data, identName)
-  write.table(clusterAverages, file=file.path(outputMarkerDir, paste0("clusters_", resolution, "_average.tsv")))
+  write.table(clusterAverages, file=snakemake@output$clusters_avg[index])
 
   clusterPCTs <- averagePCT(data, identName)
-  write.table(clusterPCTs, file=file.path(outputMarkerDir, paste0("clusters_", resolution, "_pct.tsv")))
+  write.table(clusterPCTs, file=snakemake@output$clusters_pct[index])
 
   deResults <- allMarkers(data, identName)
   write.table(deResults,
-              file.path(outputMarkerDir, paste0("markers_", resolution, ".tsv")),
+              snakemake@output$markers[index],
               sep="\t",
               quote=F,
               row.names=F)
