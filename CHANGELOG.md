@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.3](https://github.com/ctlab/scn-pipeline/compare/v1.0.2...v1.0.3) (2022-10-04)
+
+### Refactoring
+
+* Now pipeline is compliant with `snakemake --lint`
+* Many fixes to utilise relative paths ([edf2dec](https://github.com/ctlab/scn-pipeline/commit/edf2dec5e530a54dabdcd83ccaa1d780aed96461), [78c9b8b](https://github.com/ctlab/scn-pipeline/commit/78c9b8b8a1a36e5098eeddb4148f304901b43948), [7404967](https://github.com/ctlab/scn-pipeline/commit/740496761aca12019419b2d440276a837a97ddda), [0d25008](https://github.com/ctlab/scn-pipeline/commit/0d2500810baa458180e8e1d717360d9413912e54), and other commits)
+ 
+### Bug Fixes
+* Removed unused files - `bam_to_fastq` and `reports.smk` ([18b8a09](https://github.com/ctlab/scn-pipeline/commit/18b8a093bdea547389a654936e3b3c18451bbe98), [b16690a](https://github.com/ctlab/scn-pipeline/commit/b16690aa3e2b31679658ca780bebbde1e80033b7))
+* Fixes to calculation of markers ([351b0ea](https://github.com/ctlab/scn-pipeline/commit/351b0ea53ec224ea809a73eeddd03245d3fc1deb))
+
+
 ## [1.0.2](https://github.com/ctlab/scn-pipeline/compare/v1.0.1...v1.0.2) (2022-09-20)
 
 
