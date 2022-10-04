@@ -36,10 +36,7 @@ rule run_star:
     # exec > {log} 2>&1
     bash {input.star_script:q}
     
-    cd `dirname {output.solo_raw_matrix:q}`
-    gzip *
-    
-    cd `dirname {output.solo_filtered_matrix:q}`
-    gzip *
+    gzip `dirname {output.solo_raw_matrix:q}`/*
+    gzip `dirname {output.solo_filtered_matrix:q}`/*
     """
 
