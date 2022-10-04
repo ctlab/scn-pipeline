@@ -90,7 +90,7 @@ class DependencyDispatcher(object):
     @if_empty_return(None)
     def star_index(self, wildcards: Wildcards) -> str:
         species = self.get_species(wildcards)
-        return self.resources + f"/star/{species}/SA"
+        return f"resources/star/{species}/SA"
 
     @if_empty_return(None)
     def get_technology(self, wildcards: Wildcards) -> str:
@@ -117,8 +117,7 @@ class DependencyDispatcher(object):
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         barcodes = [
-            run.get_barcode_read().get_path(self.out_dir +
-                                            f"/data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
+            run.get_barcode_read().get_path(f"data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
             for run in runs if run.get_barcode_read() is not None
         ]
         return barcodes
@@ -128,8 +127,7 @@ class DependencyDispatcher(object):
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         cdna = [
-            run.get_cdna_read().get_path(self.out_dir +
-                                         f"/data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
+            run.get_cdna_read().get_path(f"data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
             for run in runs if run.get_cdna_read() is not None
         ]
         return cdna
@@ -139,8 +137,7 @@ class DependencyDispatcher(object):
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         index = [
-            run.get_index_read().get_path(self.out_dir +
-                                          f"/data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
+            run.get_index_read().get_path(f"data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
             for run in runs if run.get_index_read() is not None
         ]
         return index
@@ -150,8 +147,36 @@ class DependencyDispatcher(object):
         sample = self.get_sample(wildcards)
         runs = sample.get_all_runs()
         bam = [
-            run.get_bam().get_path(self.out_dir +
-                                   f"/data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
+            run.get_bam().get_path(f"data/samples/{wildcards.get('dataset')}/{wildcards.get('sample')}")
             for run in runs if run.get_bam() is not None
         ]
         return bam
+
+    @if_empty_return([])
+    def get_seurat_objects(self, wildcards: Wildcards) -> List[str]:
+        samples = self.get_sample_names(wildcards)
+
+        return [
+            f"data/samples/{wildcards.get('dataset')}/{sample}/seurat.rds" for sample in samples
+        ]
+
+    @if_empty_return([])
+    def get_seurat_objects_forced(self, wildcards: Wildcards) -> List[str]:
+        return [file for file in self.get_seurat_objects(wildcards) if os.path.exists(file)]
+
+    @if_empty_return(None)
+    def get_file(self, wildcards: Wildcards) -> FFQFile:
+        files = self.get_run(wildcards).files
+        filename = wildcards.get("filename")
+        file = [file for file in files if file.filename == filename][0]
+        return file
+
+    @if_empty_return(None)
+    def get_file_url(self, wildcards: Wildcards) -> str:
+        file = self.get_file(wildcards)
+        return file.url
+
+    @if_empty_return(None)
+    def get_file_md5(self, wildcards: Wildcards) -> str:
+        file = self.get_file(wildcards)
+        return file.md5
