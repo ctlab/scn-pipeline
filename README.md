@@ -27,36 +27,21 @@ You first have to configure the project and provide paths to relevant
 files and folder. The configuration is storen in `configs/config.yaml` file and
 consists of several fields. The only two necessary fields that are required to fill are `out_dir` and `ncbi_dir`.
 
-`out_dir` is a directory that will be used to store results and preliminary results (and by default resources and logs).
+`out_dir` is a directory that will be used to store results, preliminary results, resources, and logs.
 
 `ncbi_dir` is a directory that is configured via `vdb-config` 
 (see [README.vdb-config](https://github.com/ncbi/sra-tools/blob/master/README-vdb-config) in https://github.com/ncbi/sra-tools)
 and path to this directory is usually stored in `~/.ncbi/user-settings.mkfg`
 
-`datasets` is a path to json file that should contain list of IDs
-
-`samples` is the file describing all the meta information collected for the datasets
-
-`resources` is the directory where all resources (whitelists, genome indexes) will be stored
-
-`logs_dir` is the directory to keep the executions logs
 
 ```yaml
 out_dir: '/path/to/out/dir' # output directory with all the results
 ncbi_dir: '/path/to/configured/ncbi/folder' # directory from vdb-config
-
-## Fields below are optional
-
-datasets: '' # default: /path/to/this/repo/configs/datasets.json
-samples: '' # default: /out/dir/meta/sample_descriptions.json
-resources: '' # default: /out/dir/resources
-logs_dir: '' # default: /out/dir/logs
 ```
 
 ## Running pipeline
 
 Once pipeline is configured, fill the datasets in `./config/dataset.yaml`
-(or other file listed in `dataset` if you decided to override this value). 
 Contents of the file should be just a list of dataset IDs (see example below)
 
 ```yaml
@@ -80,3 +65,11 @@ To process the datasets for which you already have meta information simply run
 ```bash
 $ snakemake --use-conda process_all
 ```
+
+Results of the pipeline can be found in the `out_dir` directory that you configured:
+
+* `/out_dir/resources` - all the resources (whitelists and genome indexes) will be stored here
+* `/out_dir/logs` - all the logs will be stored here
+* `/out_dir/meta/{dataset}` - meta information for the datasets (results of `get_all_meta`)
+* `/out_dir/data/samples/{dataset}/{sample}` - sample-level analysis and STAR results are stored here
+* `/out_dir/data/datasets/{dataset}/` - dataset-level integration analysis results are stored here

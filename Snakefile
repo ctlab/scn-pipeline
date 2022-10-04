@@ -2,19 +2,14 @@ from snakemake.utils import min_version
 from workflow.scripts.DependencyDispatcher import DependencyDispatcher
 import os
 
-
 min_version("7.0")
 configfile: "configs/config.yaml"
 
-config["datasets"] = config.get("datasets", os.path.join(os.getcwd(), "configs", "datasets.json"))
-config["samples"] = config.get("samples", os.path.join(config["out_dir"], "meta", "sample_description.json"))
-config["templates"] = config.get("templates", os.path.join(os.getcwd(), "workflow", "templates"))
-config["resources"] = config.get("resources", os.path.join(config["out_dir"], "resources"))
-config["logs_dir"] = config.get("logs_dir", os.path.join(config["out_dir"], "logs"))
-
-wildcard_constraints:
-    run="SRR\d+",
-    filename="\w+(\\.\w+)*"
+config["datasets"] = os.path.join(os.getcwd(), "configs", "datasets.json")
+config["templates"] = os.path.join(os.getcwd(), "workflow", "templates")
+config["samples"] = os.path.join(config["out_dir"], "sample_description.json")
+config["resources"] = os.path.join(config["out_dir"], "resources")
+config["logs_dir"] = os.path.join(config["out_dir"], "logs")
 
 
 include: "workflow/rules/resources/get_all_resources.smk"
@@ -22,8 +17,10 @@ include: "workflow/rules/preparation/find_single_cell.smk"
 include: "workflow/rules/preparation/get_all_meta.smk"
 include: "workflow/rules/processing/get_file.smk"
 include: "workflow/rules/analysis/analysis.smk"
-include: "workflow/rules/utils/utils.smk"
 
+wildcard_constraints:
+    run=r"SRR\d+",
+    filename=r"\w+(\\.\w+)*"
 
 dispatcher = DependencyDispatcher(config)
 datasets = dispatcher.get_datasets()
@@ -38,6 +35,8 @@ for dataset in datasets.keys():
 
 DEFAULT_RESOLUTION = 2
 
+workdir: config["out_dir"]
+
 rule process_all:
     input:
         seurat=expand(rules.seurat_analysis.output.seurat, zip, dataset=datasets_full, sample=samples_full),
@@ -49,4 +48,4 @@ rule process_all:
         merged_pct=expand(rules.markers_merged.output.clusters_pct[DEFAULT_RESOLUTION], dataset=datasets_full),
         merged_average=expand(rules.markers_merged.output.clusters_avg[DEFAULT_RESOLUTION], dataset=datasets_full)
 
-localrules: process_all, print_sample_names
+localrules: process_all

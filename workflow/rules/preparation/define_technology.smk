@@ -6,13 +6,13 @@ rule define_tech:
         whitelist_10x_v1=rules.get_whitelists.output.whitelist_10x_v1,
         whitelist_10x_v2=rules.get_whitelists.output.whitelist_10x_v2,
         whitelist_10x_v3=rules.get_whitelists.output.whitelist_10x_v3,
-    output: ffq_full=config['out_dir'] + "/meta/{dataset}/ffq.json"
+    output: ffq_full="meta/{dataset}/ffq.json"
     params:
         dataset="{dataset}",
-        header_dir=config['out_dir'] + "/meta/{dataset}/headers/",
+        header_dir="meta/{dataset}/headers/",
         ncbi_dir=config['ncbi_dir']
-    # log: config['logs_dir'] + "/{dataset}/define_technology.log"
-    benchmark: config['logs_dir'] + "/{dataset}/define_technology.benchmark"
+    log: "logs/{dataset}/define_technology.log"
+    benchmark: "logs/{dataset}/define_technology.benchmark"
     threads: 4
     resources:
         mem_mb=8000
