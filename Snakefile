@@ -17,6 +17,7 @@ include: "workflow/rules/preparation/find_single_cell.smk"
 include: "workflow/rules/preparation/get_all_meta.smk"
 include: "workflow/rules/processing/get_file.smk"
 include: "workflow/rules/analysis/analysis.smk"
+include: "workflow/rules/scn/convert.smk"
 
 wildcard_constraints:
     run=r"SRR\d+",
