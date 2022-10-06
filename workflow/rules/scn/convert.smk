@@ -43,7 +43,7 @@ use rule convert_to_scn as convert_to_scn_merged with:
         data_h5="data/datasets/{dataset}/scn/data.h5",
         markers="data/datasets/{dataset}/scn/markers.json"
     params:
-        species=DependencyDispatcher(config).get_species,
+        species=DependencyDispatcher(config).get_common_species,
         level='dataset',
         dataset='{dataset}',
         token='{dataset}'

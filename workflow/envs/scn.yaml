@@ -9,3 +9,4 @@ dependencies:
  - r-data.table=1.14.2
  - r-dplyr=1.0.9
  - r-devtools=2.4.4
+ - bioconda::bioconductor-rhdf5=2.34.0

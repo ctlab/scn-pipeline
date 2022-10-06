@@ -2,7 +2,7 @@ from snakemake.utils import min_version
 from workflow.scripts.DependencyDispatcher import DependencyDispatcher
 import os
 
-min_version("7.0")
+min_version("7.14.1")
 configfile: "configs/config.yaml"
 
 config["datasets"] = os.path.join(os.getcwd(), "configs", "datasets.json")
@@ -13,10 +13,8 @@ config["logs_dir"] = os.path.join(config["out_dir"], "logs")
 
 
 include: "workflow/rules/resources/get_all_resources.smk"
-include: "workflow/rules/preparation/find_single_cell.smk"
 include: "workflow/rules/preparation/get_all_meta.smk"
 include: "workflow/rules/processing/get_file.smk"
-include: "workflow/rules/analysis/analysis.smk"
 include: "workflow/rules/scn/convert.smk"
 
 wildcard_constraints:
@@ -55,4 +53,4 @@ rule scn:
         plot_data=expand(rules.convert_to_scn.output.plot_data, zip, dataset=datasets_full, sample=samples_full),
         plot_data_merged=expand(rules.convert_to_scn_merged.output.plot_data, dataset=datasets_full)
 
-localrules: process_all
+localrules: process_all, scn

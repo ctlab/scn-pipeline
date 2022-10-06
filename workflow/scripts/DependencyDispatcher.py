@@ -84,6 +84,14 @@ class DependencyDispatcher(object):
         return DependencyDispatcher.ORGANISM_MAPPING[sample.organism]
 
     @if_empty_return(None)
+    def get_common_species(self, wildcards: Wildcards) -> str:
+        dataset = self.get_dataset(wildcards)
+        species = set()
+        for sample in dataset.samples.values():
+            species.add(sample.organism)
+        return list(species)[0]
+
+    @if_empty_return(None)
     def get_db(self, wildcards: Wildcards) -> str:
         return self.get_dataset(wildcards).db
 
