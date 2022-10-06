@@ -48,4 +48,10 @@ rule process_all:
         merged_pct=expand(rules.markers_merged.output.clusters_pct[DEFAULT_RESOLUTION], dataset=datasets_full),
         merged_average=expand(rules.markers_merged.output.clusters_avg[DEFAULT_RESOLUTION], dataset=datasets_full)
 
+
+rule scn:
+    input:
+        plot_data=expand(rules.convert_to_scn.output.plot_data, zip, dataset=datasets_full, sample=samples_full),
+        plot_data_merged=expand(rules.convert_to_scn_merged.output.plot_data, dataset=datasets_full)
+
 localrules: process_all
