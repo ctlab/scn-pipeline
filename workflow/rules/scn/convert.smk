@@ -26,7 +26,7 @@ rule convert_to_scn:
     threads: 1
     resources:
         mem_mb=64000
-    conda: "../../envs/seurat_analysis.yaml"
+    conda: "../../envs/scn.yaml"
     script: "../../scripts/convert.R"
 
 
@@ -47,6 +47,6 @@ use rule convert_to_scn as convert_to_scn_merged with:
         level='dataset',
         dataset='{dataset}',
         token='{dataset}'
-    log: "logs/{dataset}/convert_to_scn.log"
+    log: "logs/{dataset}/scn.log"
     benchmark: "logs/{dataset}/convert_to_scn.benchmark"
 
