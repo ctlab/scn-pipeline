@@ -1,0 +1,11 @@
+name: scn
+channels:
+ - conda-forge
+dependencies:
+ - r-base=4.0.3
+ - r-matrix=1.4_1
+ - r-seurat=4.1.1
+ - r-msigdbr=7.5.1
+ - r-data.table=1.14.2
+ - r-dplyr=1.0.9
+ - r-devtools=2.4.4

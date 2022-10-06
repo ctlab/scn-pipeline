@@ -13,10 +13,12 @@ TECH_CITESEQ = 'CITESEQ'
 TECH_SLIDESEQ = 'SLIDESEQ'
 TECH_SPLITSEQ = 'SPLITSEQ'
 TECH_SCIRNASEQ = 'SCIRNASEQ'
+TECH_VISIUM = "VISIUM"
 
 
 ALL_PATTERNS = {
-    TECH_10X: r"cell[\s-]*ranger|chromium|10x|[\s-]*genomics",
+    TECH_10X: r"cell[\s-]*ranger|chromium|10x[\s-]*genomics",
+    TECH_VISIUM: r"space[\s-]*ranger|visium",
     TECH_DROPSEQ: r"drop[\s-]*seq",
     TECH_CELSEQ: r"cel[\s-]*seq",
     TECH_INDROPS: r"in[\s-]*drops",
@@ -58,6 +60,7 @@ TYPE_BARCODE = "barcode"
 TYPE_INDEX = "index"
 
 ALLOWED_FILETYPES = [FILETYPE_FASTQ, FILETYPE_BAM, FILETYPE_FQDUMP]
+SUPPORTED_TECHS = [TECH_10X, TECH_DROPSEQ]
 AWS_TYPE = 'aws'
 FTP_TYPE = 'ftp'
 GCP_TYPE = 'gcp'
