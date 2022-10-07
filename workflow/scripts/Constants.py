@@ -14,6 +14,7 @@ TECH_SLIDESEQ = 'SLIDESEQ'
 TECH_SPLITSEQ = 'SPLITSEQ'
 TECH_SCIRNASEQ = 'SCIRNASEQ'
 TECH_VISIUM = "VISIUM"
+TECH_BDRHAPSODY = "BDRHAPSODY"
 
 
 ALL_PATTERNS = {
@@ -30,7 +31,8 @@ ALL_PATTERNS = {
     TECH_CITESEQ: r"cite[\s-]*seq",
     TECH_SLIDESEQ: r"slide[\s]*seq",
     TECH_SPLITSEQ: r"split[\s-]*seq",
-    TECH_SCIRNASEQ: r"sci[\s-]*rna[\s-]*seq"
+    TECH_SCIRNASEQ: r"sci[\s-]*rna[\s-]*seq",
+    TECH_BDRHAPSODY: r"bd[\s-]*rhapsody"
 }
 
 ALL_TECH = {
