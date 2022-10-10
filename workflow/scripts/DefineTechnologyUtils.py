@@ -197,12 +197,10 @@ def find_patterns(experiment_package) -> set:
                      'STUDY/DESCRIPTOR/STUDY_ABSTRACT']
 
     for section in where_to_look:
-        found_patterns = [
-            elem
-            for index, elem in Constants.DF_PATTERN.findall(elem2.text)
-            for index2, elem2 in experiment_package.findall(section)
-        ]
-        seen_pattern.update(found_patterns)
+        elements = experiment_package.findall(section)
+        for elem in elements:
+            found_patterns = Constants.DF_PATTERN.findall(elem.text)
+            seen_pattern.update(found_patterns)
     return seen_pattern
 
 
