@@ -197,7 +197,11 @@ def find_patterns(experiment_package) -> set:
                      'STUDY/DESCRIPTOR/STUDY_ABSTRACT']
 
     for section in where_to_look:
-        found_patterns = Constants.DF_PATTERN.findall(experiment_package.find(section).text)
+        found_patterns = [
+            elem
+            for index, elem in Constants.DF_PATTERN.findall(elem2.text)
+            for index2, elem2 in experiment_package.findall(section)
+        ]
         seen_pattern.update(found_patterns)
     return seen_pattern
 
@@ -362,7 +366,19 @@ def get_tech_from_srx(srr_accession, alias):
         titles.extend([elem.text for index, elem in enumerate(tree.findall('EXPERIMENT_PACKAGE/EXPERIMENT/TITLE'))])
         if len(titles) > 0:
             result['title'] = titles[0]
-        result['description'] = tree.find("EXPERIMENT_PACKAGE").find("STUDY").find("DESCRIPTOR").find("STUDY_ABSTRACT").text
+
+        descriptions = [
+            elem.text for index, elem in enumerate(tree.findall('EXPERIMENT_PACKAGE/STUDY/DESCRIPTOR/STUDY_ABSTRACT'))
+        ]
+
+        descriptions.extend([
+            elem.text for index, elem in enumerate(
+                tree.findall('EXPERIMENT_PACKAGE/EXPERIMENT/DESIGN/DESIGN_DESCRIPTION')
+            )
+        ])
+
+        if len(descriptions) > 0:
+            result['description'] = descriptions[0]
 
         if not is_rna_seq(tree):
             return result
@@ -376,8 +392,6 @@ def get_tech_from_srx(srr_accession, alias):
     except ET.ParseError as e:
         result["error"] = "Empty response"
         return result
-
-
 
 
 def parse_srs_for_tech(srr_accession):
