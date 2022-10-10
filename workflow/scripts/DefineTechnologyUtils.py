@@ -113,7 +113,7 @@ def get_geo_ids(start_date: datetime.date, end_date: datetime.date, org: str) ->
               f']+AND+{re.sub(" ", "%20", org)}[orgn]AND+(gse[ETYP]+OR+gds[ETYP])&retmax=50000&usehistory=y '
     gds_ids = url_open(xml_url).read()
     gds_tree = ET.fromstring(gds_ids)
-    gds_pattern = re.compile(r'^200')
+    gds_pattern = re.compile(r'^20+')
     gse_ids = list()
     for elem in gds_tree.findall('IdList/Id'):
         gse_ids.append(gds_pattern.sub('GSE', elem.text))
@@ -358,7 +358,10 @@ def get_tech_from_srx(srr_accession, alias):
                 .find("TAXON_ID").text
         )
 
-        result['title'] = tree.find("EXPERIMENT_PACKAGE").find("SAMPLE").find("TITLE").text
+        titles = [elem.text for index, elem in enumerate(tree.findall('EXPERIMENT_PACKAGE/SAMPLE/TITLE'))]
+        titles.extend([elem.text for index, elem in enumerate(tree.findall('EXPERIMENT_PACKAGE/EXPERIMENT/TITLE'))])
+        if len(titles) > 0:
+            result['title'] = titles[0]
         result['description'] = tree.find("EXPERIMENT_PACKAGE").find("STUDY").find("DESCRIPTOR").find("STUDY_ABSTRACT").text
 
         if not is_rna_seq(tree):
