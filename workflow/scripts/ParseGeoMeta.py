@@ -28,7 +28,7 @@ def find_geo_meta(dataset: str, file_study: str, file_sample: str):
         with open(file_study, "w") as study:
             study.writelines(["\t".join(["dataset", "n", "sample", "technology",
                                          "taxon_id", "title", "description", "link"]),
-                              "\t".join([dataset, 0, "[]", "[]",
+                              "\t".join([dataset, "0", "[]", "[]",
                                          "[0]", results["title"], results["description"], link])])
 
 if __name__ == '__main__':
