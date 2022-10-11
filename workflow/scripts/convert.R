@@ -9,6 +9,7 @@ title <- ""
 description <- ""
 link <- ""
 token <- snakemake@params$token
+species <- snakemake@params$species
 
 
 if (snakemake@params$level == "dataset") {
@@ -16,7 +17,7 @@ if (snakemake@params$level == "dataset") {
   description <- study$description
   link <- study$link
 } else if (snakemake@params$level == "sample") {
-  sample <- samples[samples$accession == token, ]
+  sample <- samples[samples$alias == token, ]
   title <- sample$title
   description <- sample$description
   link <- sample$link
@@ -32,12 +33,12 @@ out_dir <- dirname(snakemake@output$descriptor)
 seurat <- readRDS(snakemake@input$seurat)
 
 migrateSeuratObject(seurat,
-                    species=snakemake@params$species,
+                    species=species,
                     name=title,
                     description=description,
                     link=link,
                     outdir=out_dir,
-                    token=snakemake@params$token,
+                    token=token,
                     markers=markers,
                     public = T,
                     curated = F,
