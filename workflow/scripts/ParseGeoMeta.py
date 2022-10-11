@@ -24,12 +24,12 @@ def find_geo_meta(dataset: str, file_study: str, file_sample: str):
     else:
         with open(file_sample, "w") as samples:
             samples.writelines(["\t".join(["accession", "alias", "link", "title", "description", "error",
-                                           "transcriptomic", "technology", "taxon_id", "dataset"])])
+                                           "transcriptomic", "technology", "taxon_id", "dataset"]) + "\n"])
         with open(file_study, "w") as study:
             study.writelines(["\t".join(["dataset", "n", "sample", "technology",
-                                         "taxon_id", "title", "description", "link"]),
+                                         "taxon_id", "title", "description", "link"]) + "\n",
                               "\t".join([dataset, "0", "[]", "[]",
-                                         "[0]", results["title"], results["description"], link])])
+                                         "[0]", results["title"], results["description"], link]) + "\n"])
 
 if __name__ == '__main__':
     dataset = snakemake.params["dataset"]
