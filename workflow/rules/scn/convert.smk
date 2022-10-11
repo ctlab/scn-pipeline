@@ -47,6 +47,6 @@ use rule convert_to_scn as convert_to_scn_merged with:
         level='dataset',
         dataset='{dataset}',
         token='{dataset}'
-    log: "logs/{dataset}/scn.log"
+    log: "logs/{dataset}/convert_to_scn.log"
     benchmark: "logs/{dataset}/convert_to_scn.benchmark"
 
