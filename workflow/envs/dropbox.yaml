@@ -1,0 +1,6 @@
+name: dropbox
+channels:
+ - conda-forge
+dependencies:
+ - python=3.10
+ - dropbox=11.33.0

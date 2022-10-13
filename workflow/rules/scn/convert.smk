@@ -50,3 +50,25 @@ use rule convert_to_scn as convert_to_scn_merged with:
     log: "logs/{dataset}/convert_to_scn.log"
     benchmark: "logs/{dataset}/convert_to_scn.benchmark"
 
+rule upload_to_dropbox:
+    input:
+        descriptor="data/samples/{dataset}/{sample}/scn/dataset.json"
+    output:
+        dropbox_receipt = "data/samples/{dataset}/{sample}/dropbox_receipt.txt"
+    params:
+        path_prefix="{dataset}/{sample}"
+    conda: "../../envs/dropbox.yaml"
+    log: "logs/{dataset}/{sample}/upload_to_dropbox.log"
+    benchmark: "logs/{dataset}/{sample}/upload_to_dropbox.benchmark"
+    script: "../../scripts/UploadToDropbox.py"
+
+use rule upload_to_dropbox as upload_to_dropbox_merged with:
+    input:
+        descriptor="data/datasets/{dataset}/scn/dataset.json"
+    output:
+        dropbox_receipt = "data/datasets/{dataset}/dropbox_receipt.txt"
+    params:
+        path_prefix="{dataset}/{dataset}"
+    log: "logs/{dataset}/upload_to_dropbox.log"
+    benchmark: "logs/{dataset}/upload_to_dropbox.benchmark"
+
