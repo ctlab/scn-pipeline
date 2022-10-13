@@ -89,7 +89,7 @@ class DependencyDispatcher(object):
         species = set()
         for sample in dataset.samples.values():
             species.add(sample.organism)
-        return list(species)[0]
+        return DependencyDispatcher.ORGANISM_MAPPING[list(species)[0]]
 
     @if_empty_return(None)
     def get_db(self, wildcards: Wildcards) -> str:
