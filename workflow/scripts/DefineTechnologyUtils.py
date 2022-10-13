@@ -199,8 +199,9 @@ def find_patterns(experiment_package) -> set:
     for section in where_to_look:
         elements = experiment_package.findall(section)
         for elem in elements:
-            found_patterns = Constants.DF_PATTERN.findall(elem.text)
-            seen_pattern.update(found_patterns)
+            if elem.text:
+                found_patterns = Constants.DF_PATTERN.findall(elem.text)
+                seen_pattern.update(found_patterns)
     return seen_pattern
 
 
@@ -360,8 +361,16 @@ def get_tech_from_srx(srr_accession, alias):
                 .find("TAXON_ID").text
         )
 
-        titles = [elem.text for index, elem in enumerate(tree.findall('EXPERIMENT_PACKAGE/SAMPLE/TITLE'))]
-        titles.extend([elem.text for index, elem in enumerate(tree.findall('EXPERIMENT_PACKAGE/EXPERIMENT/TITLE'))])
+        titles = [
+            elem.text
+            for index, elem in enumerate(tree.findall('EXPERIMENT_PACKAGE/SAMPLE/TITLE'))
+            if elem.text
+        ]
+        titles.extend([
+            elem.text
+            for index, elem in enumerate(tree.findall('EXPERIMENT_PACKAGE/EXPERIMENT/TITLE'))
+            if elem.text
+        ])
         if len(titles) > 0:
             result['title'] = titles[0]
 
