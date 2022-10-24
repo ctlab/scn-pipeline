@@ -14,6 +14,7 @@ rule ncbi_prefetch:
     log: "logs/{run}/ncbi_prefetch.log"
     benchmark: "logs/{run}/ncbi_prefetchbenchmark"
     conda: "../../envs/entrez_direct_utils.yaml"
+    priority: 0
     shell: """
     prefetch --max-size {params.max_size} {params.run} 2>&1 > {log}
     """
@@ -33,6 +34,7 @@ rule get_file:
         filename="{filename}"
     resources:
         mem_mb=4000
+    priority: 0
     shell: """
     mkdir -p {params.work_dir}
     wget -q -O {output:q} {params.url:q} 2> {log}
@@ -71,6 +73,7 @@ rule get_fastq_dump_files:
             temp("data/samples/{dataset}/{sample}/files/{run}/fastq_dump/{run}_4.fastq.gz")
         ]
     conda: "../../envs/entrez_direct_utils.yaml"
+    priority: 1
     params:
         sra='{run}',
         work_dir=lambda wildcards, output: os.path.split(output.outs[0])[0]

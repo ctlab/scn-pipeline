@@ -26,6 +26,7 @@ rule run_star:
         log_out="data/samples/{dataset}/{sample}/star/solo/Log.out",
         log_progress_out="data/samples/{dataset}/{sample}/star/solo/Log.progress.out",
         log_final_out="data/samples/{dataset}/{sample}/star/solo/Log.final.out"
+    priority: 2
     resources:
         mem_mb=32000
     threads: 4
