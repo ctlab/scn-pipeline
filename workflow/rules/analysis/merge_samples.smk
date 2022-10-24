@@ -18,6 +18,7 @@ rule merge_samples:
         default_resolution = DEFAULT_RESOLUTION,
         dataset="{dataset}"
     threads: 4
+    priority: 5
     resources:
         mem_mb=64000
     log: "logs/{dataset}/merge_samples.log"

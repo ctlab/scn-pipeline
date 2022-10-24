@@ -28,6 +28,7 @@ rule seurat_analysis:
         default_resolution = DEFAULT_RESOLUTION,
         sample="{sample}"
     threads: 4
+    priority: 4
     resources:
         mem_mb=16000
     log: "logs/{dataset}/{sample}/seurat_analysis.log"

@@ -8,6 +8,7 @@ rule filter_counts_star:
     output:
         filtered_counts="data/samples/{dataset}/{sample}/star/filtered_counts.rds",
     threads: 4
+    priority: 3
     resources:
         mem_mb=16000
     log: "logs/{dataset}/{sample}/star/filter_counts.log"

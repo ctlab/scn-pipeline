@@ -25,6 +25,7 @@ rule markers:
     params:
         resolutions = RESOLUTIONS
     threads: 4
+    priority: 6
     resources:
         mem_mb=16000
     log: "logs/{dataset}/{sample}/markers.log"
