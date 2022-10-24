@@ -74,10 +74,20 @@ def get_read_length_fastq(fastq_path: str) -> int:
 
 
 def get_read_length_sam(sam_path: str) -> int:
+    barcode = ""
     with pysam.AlignmentFile(sam_path) as file:
-        line = next(file)
-        barcode = re.sub('-[0-9]*', '', line.get_tag('CB')).strip()
+        for idx, line in enumerate(file):
+            try:
+                barcode = re.sub('-[0-9]*', '', line.get_tag('CB')).strip()
+                break
+            except KeyError:
+                continue
+            except (OSError, StopIteration) as e:
+                break
+    if barcode:
         return len(barcode)
+    else:
+        raise KeyError(f"Tag CB is not found in {sam_path}")
 
 
 def tech_version_10x_fq_r1(fastq_path: str, white_list_paths: dict[int, str]) -> dict:
@@ -186,7 +196,8 @@ def get_read_type_sam(sam_path: str,
         key: count / total_count
         for key, count in results.items()
     }
-    stats_string = ", ".join([f"v{version}: {percent:.2f}" for version, percent in results.items()])
+    stats_string = f"reads tested: {total_count}, " + \
+                   ", ".join([f"v{version}: {percent:.2f}" for version, percent in results.items()])
     logging.warning(f"Stats for {sam_path}: {stats_string}")
 
     current_max = RATIO_THRESHOLD
@@ -329,11 +340,21 @@ def prepare_files_10x(srr_accession,
     bam_files = list(filter(lambda x: x["filetype"] == FILETYPE_BAM, ftp_files))
 
     # number of files that are ok to use is from 2 to 4
+    logging.warning(f"Found {len(fastq_files)} fastq files, "
+                    f"files are {', '.join([file['filename'] for file in fastq_files])}")
     if 2 <= len(fastq_files) <= 4:
         logging.warning(f"Checking {len(fastq_files)} FTP fastq files")
         result_files, version = get_files_from_ftp_fastq(fastq_files, header_dir, white_list_paths)
         if version != -1:
             return result_files, FILETYPE_FASTQ, version
+
+    total_bam_files = len(bam_files)
+    logging.warning(f"Found {total_bam_files} bam files, "
+                    f"files are {', '.join([file['filename'] for file in bam_files])}")
+
+    bam_files = list(filter(lambda x: not x["filename"].endswith(".bai"), bam_files))
+    if total_bam_files > len(bam_files):
+        logging.warning(f"Ignoring {total_bam_files - len(bam_files)} bam index files")
 
     # number of files that are ok to use is 1
     if len(bam_files) == 1:
