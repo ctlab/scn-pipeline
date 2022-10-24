@@ -104,6 +104,7 @@ if __name__ == '__main__':
     path_prefix = snakemake.params["path_prefix"]
     receipt = snakemake.output["dropbox_receipt"]
 
+
     with open(receipt, "w") as receipt:
         for root, subdirs, files in os.walk(results_directory):
             for file in files:

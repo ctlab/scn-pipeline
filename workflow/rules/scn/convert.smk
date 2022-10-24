@@ -52,7 +52,20 @@ use rule convert_to_scn as convert_to_scn_merged with:
 
 rule upload_to_dropbox:
     input:
-        descriptor="data/samples/{dataset}/{sample}/scn/dataset.json"
+        descriptor=rules.convert_to_scn.output.descriptor,
+        plots=directory("data/samples/{dataset}/{sample}/plots"),
+        seurat=rules.seurat_analysis.output.seurat,
+        star_summary = rules.run_star.output.solo_summary,
+        star_raw_counts=[
+            rules.run_star.output.solo_raw_barcodes,
+            rules.run_star.output.solo_raw_features,
+            rules.run_star.output.solo_raw_matrix
+        ],
+        star_filtered_counts=[
+            rules.run_star.output.solo_filtered_barcodes,
+            rules.run_star.output.solo_filtered_features,
+            rules.run_star.output.solo_filtered_matrix
+        ]
     output:
         dropbox_receipt = "data/samples/{dataset}/{sample}/dropbox_receipt.txt"
     params:
@@ -64,7 +77,9 @@ rule upload_to_dropbox:
 
 use rule upload_to_dropbox as upload_to_dropbox_merged with:
     input:
-        descriptor="data/datasets/{dataset}/scn/dataset.json"
+        descriptor=rules.convert_to_scn_merged.output.descriptor,
+        plots=directory("data/datasets/{dataset}/plots"),
+        seurat=rules.merge_samples.output.seurat,
     output:
         dropbox_receipt = "data/datasets/{dataset}/dropbox_receipt.txt"
     params:

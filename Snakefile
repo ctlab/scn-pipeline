@@ -2,7 +2,7 @@ from snakemake.utils import min_version
 from workflow.scripts.DependencyDispatcher import DependencyDispatcher
 import os
 
-min_version("7.14.1")
+min_version("7.0")
 configfile: "configs/config.yaml"
 
 config["datasets"] = os.path.join(os.getcwd(), "configs", "datasets.json")
