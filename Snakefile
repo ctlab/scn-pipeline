@@ -19,7 +19,7 @@ include: "workflow/rules/analysis/analysis.smk"
 
 wildcard_constraints:
     run=r"SRR\d+",
-    filename=r"\w+(\\.\w+)*"
+    filename=r"[\\.|\w]+"
 
 dispatcher = DependencyDispatcher(config)
 datasets = dispatcher.get_datasets()
