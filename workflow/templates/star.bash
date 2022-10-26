@@ -30,6 +30,7 @@ STAR --genomeDir $index_dir \
   --readFilesType SAM SE \
   --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR --soloUMIdedup 1MM_CR \
   --soloInputSAMattrBarcodeSeq CR UR --soloInputSAMattrBarcodeQual CY UY \
+  --soloBarcodeReadLength 0 \
   --soloType CB_UMI_Simple \
   --soloCBwhitelist {{ whitelist }} \
   --outFileNamePrefix {{ out_dir }} \
