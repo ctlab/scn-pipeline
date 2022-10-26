@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.0.4](https://github.com/ctlab/scn-pipeline/compare/v1.0.3...v1.0.4) (2022-10-26)
+
+
+### Bug Fixes
+
+* added priorities to run DAG depth-first ([605924e](https://github.com/ctlab/scn-pipeline/commit/605924e8a3df99a7a1e79db302e9429f6640d2c4))
+* now ignoring bam index files, if they are present. fixing error where CB tag is not present in the first read of bam file ([cc886d3](https://github.com/ctlab/scn-pipeline/commit/cc886d3c18092733729d6d9a0f017bc660285e3d))
+* now refering to factor variable explicitly, fixes [#3](https://github.com/ctlab/scn-pipeline/issues/3) ([29ee892](https://github.com/ctlab/scn-pipeline/commit/29ee892d698d544740b85b4ec805cc0f8c8e53f9))
+* regular expression now works better with dots in the filename ([df86c70](https://github.com/ctlab/scn-pipeline/commit/df86c704b3b8d10c50513740289f24b712144b34))
+* removed check for barcode length in bam files ([1972d1a](https://github.com/ctlab/scn-pipeline/commit/1972d1a117822b5a0501e7c222beacdcbce6a0c5))
+* rename read_length to barcode_length, was causing inability to find reliably find index reads ([2258e89](https://github.com/ctlab/scn-pipeline/commit/2258e894747412fd6ac2d20ad60b6303fe1af713))
+* set resource priority higher than data downloading, so it starts earlier ([53d99aa](https://github.com/ctlab/scn-pipeline/commit/53d99aa28c444060cc1bd1aac13ab459bc58604a))
+
 ## [1.0.3](https://github.com/ctlab/scn-pipeline/compare/v1.0.2...v1.0.3) (2022-10-04)
 
 ### Refactoring
