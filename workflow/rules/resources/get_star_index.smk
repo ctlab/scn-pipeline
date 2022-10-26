@@ -22,7 +22,7 @@ rule get_star_index:
         star_sjdb_list_from_gtf_out = "resources/star/{species}/sjdbList.fromGTF.out.tab",
         star_sjdb_list_out = "resources/star/{species}/sjdbList.out.tab",
         star_transcript_info = "resources/star/{species}/transcriptInfo.tab",
-    priority: 0
+    priority: 2
     params:
         out_dir=lambda wildcards, output: os.path.split(output.star_genome)[0]
     threads: 4
