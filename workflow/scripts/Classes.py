@@ -105,7 +105,7 @@ class Run(JsonYamlSerializable):
             return index_files[0]
         else:
             # select max read length
-            index_files_ordered = sorted(index_files, key=lambda file: -file.read_length)
+            index_files_ordered = sorted(index_files, key=lambda file: -file.barcode_length)
             return index_files_ordered[0]
 
 
