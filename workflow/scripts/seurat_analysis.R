@@ -143,7 +143,7 @@ defaultIdent <- paste0('SCT_snn_res.', defaultResolution)
 
 seurat_stats$clustering <- list()
 for (ident in allIdents) {
-  seurat_stats$clustering[[ident]] <- length(levels(data[[ident]]))
+  seurat_stats$clustering[[ident]] <- length(levels(data@meta.data[[ident]]))
 }
 
 Idents(data) <- data[[defaultIdent]]
