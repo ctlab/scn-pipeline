@@ -16,6 +16,7 @@ rule ncbi_prefetch:
     conda: "../../envs/entrez_direct_utils.yaml"
     priority: 0
     shell: """
+    rm -f {output.sra}*
     prefetch --max-size {params.max_size} {params.run} 2>&1 > {log}
     """
 
