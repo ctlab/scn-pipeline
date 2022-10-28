@@ -106,25 +106,26 @@ data <- SCTransform(
 )
 
 ## PCA
+npcs <- min(ncol(data), 50)
 data <- RunPCA(object = data,
                features = VariableFeatures(object = data), 
-               npcs=50)
+               npcs=npcs)
 
-elbowPlot <- ElbowPlot(data, ndims = 50)
+elbowPlot <- ElbowPlot(data, ndims = npcs)
 ggsave(snakemake@output$elbow_plot, plot=elbowPlot, width=6, height=4)
 
 ## TSNE
-
+perplexity <- min(floor((ncol(data) - 1) / 3), 30)
 data <- RunTSNE(data, 
-                dims = 1:20, 
+                dims = 1:20,
+                perplexity = perplexity,
                 tsne.method = "FIt-SNE",
                 nthreads = 4, 
                 max_iter = 2000)
 
 
 ## UMAP
-
-data <- RunUMAP(data, dims = 1:20)
+data <- RunUMAP(data, dims = 1:20, n.neighbors = perplexity)
 
 
 ## CLUSTERING
