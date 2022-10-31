@@ -1,6 +1,8 @@
 library(Seurat)
 library(ggplot2)
 
+options(future.globals.maxSize = 8000 * 1024^2)
+
 object.list <- sapply(snakemake@input$objects, readRDS)
 features <- SelectIntegrationFeatures(object.list = object.list, nfeatures = 3000)
 object.list <- PrepSCTIntegration(object.list = object.list, anchor.features = features)
@@ -9,7 +11,8 @@ anchors <- FindIntegrationAnchors(object.list = object.list,
                                   normalization.method = "SCT",
                                   anchor.features = features)
 
-objects.combined <- IntegrateData(anchorset = anchors, normalization.method = "SCT")
+k.weight <- min(min(sapply(object.list, dim)[2, ]), 100)
+objects.combined <- IntegrateData(anchorset = anchors, normalization.method = "SCT", k.weight = k.weight)
 objects.combined <- RunPCA(objects.combined, verbose = FALSE)
 rm(anchors, object.list)
 
