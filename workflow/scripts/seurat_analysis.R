@@ -106,7 +106,7 @@ data <- SCTransform(
 )
 
 ## PCA
-npcs <- min(ncol(data), 50)
+npcs <- min(ncol(data) - 1, 50)
 data <- RunPCA(object = data,
                features = VariableFeatures(object = data), 
                npcs=npcs)
