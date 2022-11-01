@@ -83,7 +83,7 @@ rule upload_to_box:
     grep INFO {log} > {output.box_receipt}
     """
 
-use rule upload_to_box as upload_to_dropbox_merged with:
+use rule upload_to_box as upload_to_box_merged with:
     input:
         descriptor=rules.convert_to_scn_merged.output.descriptor,
         plots=directory("data/datasets/{dataset}/plots"),
