@@ -13,13 +13,13 @@ species <- snakemake@params$species
 
 
 if (snakemake@params$level == "dataset") {
-  title <- study$title
-  description <- study$description
+  title <- snakemake@params$dataset
+  description <- sprintf("%s | %s | %s", snakemake@params$dataset, study$title, study$description)
   link <- study$link
 } else if (snakemake@params$level == "sample") {
   sample <- samples[samples$alias == token, ]
-  title <- sample$title
-  description <- sample$description
+  title <- snakemake@params$sample
+  description <- sprintf("%s | %s | %s | %s", snakemake@params$dataset, snakemake@params$sample, sample$title, sample$description)
   link <- sample$link
 }
 

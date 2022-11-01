@@ -1,5 +1,7 @@
 from workflow.scripts.DependencyDispatcher import DependencyDispatcher
+import os
 
+include: "geseca.smk"
 include: "../analysis/analysis.smk"
 include: "../preparation/find_single_cell.smk"
 
@@ -50,12 +52,13 @@ use rule convert_to_scn as convert_to_scn_merged with:
     log: "logs/{dataset}/convert_to_scn.log"
     benchmark: "logs/{dataset}/convert_to_scn.benchmark"
 
-rule upload_to_dropbox:
+rule upload_to_box:
     input:
         descriptor=rules.convert_to_scn.output.descriptor,
         plots=directory("data/samples/{dataset}/{sample}/plots"),
         seurat=rules.seurat_analysis.output.seurat,
         star_summary = rules.run_star.output.solo_summary,
+        rev_pca = rules.rev_pca_sample.output.rev_pca,
         star_raw_counts=[
             rules.run_star.output.solo_raw_barcodes,
             rules.run_star.output.solo_raw_features,
@@ -67,23 +70,30 @@ rule upload_to_dropbox:
             rules.run_star.output.solo_filtered_matrix
         ]
     output:
-        dropbox_receipt = "data/samples/{dataset}/{sample}/dropbox_receipt.txt"
+        box_receipt = "data/samples/{dataset}/{sample}/box_receipt.txt"
     params:
-        path_prefix="{dataset}/{sample}"
-    conda: "../../envs/dropbox.yaml"
-    log: "logs/{dataset}/{sample}/upload_to_dropbox.log"
-    benchmark: "logs/{dataset}/{sample}/upload_to_dropbox.benchmark"
-    script: "../../scripts/UploadToDropbox.py"
+        to_upload=lambda wildcards, output: os.path.split(output["box_receipt"])[0],
+        box_path="dump_2022/data/{dataset}_{sample}"
+    conda: "../../envs/git.yaml"
+    log: "logs/{dataset}/{sample}/upload_to_box.log"
+    benchmark: "logs/{dataset}/{sample}/upload_to_box.benchmark"
+    shell: """
+    rclone copy {params.to_upload} remote:{params.box_path} -vv --transfers=16 --log-file={log}
+    grep INFO {log} > {output.box_receipt}
+    """
 
-use rule upload_to_dropbox as upload_to_dropbox_merged with:
+use rule upload_to_box as upload_to_dropbox_merged with:
     input:
         descriptor=rules.convert_to_scn_merged.output.descriptor,
         plots=directory("data/datasets/{dataset}/plots"),
         seurat=rules.merge_samples.output.seurat,
+        rev_pca=rules.rev_pca_dataset.output.rev_pca
     output:
-        dropbox_receipt = "data/datasets/{dataset}/dropbox_receipt.txt"
+        box_receipt = "data/datasets/{dataset}/dropbox_receipt.txt"
     params:
-        path_prefix="{dataset}/{dataset}"
-    log: "logs/{dataset}/upload_to_dropbox.log"
-    benchmark: "logs/{dataset}/upload_to_dropbox.benchmark"
+        to_upload=lambda wildcards, output: os.path.split(output["box_receipt"])[0],
+        box_path="dump_2022/data/{dataset}"
+    conda: "../../envs/git.yaml"
+    log: "logs/{dataset}/upload_to_box.log"
+    benchmark: "logs/{dataset}/upload_to_box.benchmark"
 

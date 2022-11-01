@@ -50,7 +50,7 @@ rule process_all:
 
 rule scn:
     input:
-        plot_data=expand(rules.convert_to_scn.output.plot_data, zip, dataset=datasets_full, sample=samples_full),
-        plot_data_merged=expand(rules.convert_to_scn_merged.output.plot_data, dataset=datasets_full)
+        box_receipt=expand(rules.upload_to_box.output.box_receipt, zip, dataset=datasets_full, sample=samples_full),
+        box_receipt_merged=expand(rules.upload_to_dropbox_merged.output.box_receipt, dataset=datasets_full)
 
 localrules: process_all, scn
