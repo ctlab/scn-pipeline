@@ -74,6 +74,7 @@ rule upload_to_box:
     params:
         to_upload=lambda wildcards, output: os.path.split(output["box_receipt"])[0],
         box_path="dump_2022/data/{dataset}_{sample}"
+    threads: 4
     conda: "../../envs/git.yaml"
     log: "logs/{dataset}/{sample}/upload_to_box.log"
     benchmark: "logs/{dataset}/{sample}/upload_to_box.benchmark"
