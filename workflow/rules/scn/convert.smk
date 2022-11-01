@@ -55,7 +55,6 @@ use rule convert_to_scn as convert_to_scn_merged with:
 rule upload_to_box:
     input:
         descriptor=rules.convert_to_scn.output.descriptor,
-        plots=directory("data/samples/{dataset}/{sample}/plots"),
         seurat=rules.seurat_analysis.output.seurat,
         star_summary = rules.run_star.output.solo_summary,
         rev_pca = rules.rev_pca_sample.output.rev_pca,
@@ -86,7 +85,6 @@ rule upload_to_box:
 use rule upload_to_box as upload_to_box_merged with:
     input:
         descriptor=rules.convert_to_scn_merged.output.descriptor,
-        plots=directory("data/datasets/{dataset}/plots"),
         seurat=rules.merge_samples.output.seurat,
         rev_pca=rules.rev_pca_dataset.output.rev_pca
     output:
