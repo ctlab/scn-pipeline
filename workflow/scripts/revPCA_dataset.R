@@ -36,4 +36,4 @@ data <- RunPCA(data,
                reduction.key="PCR_")
 
 E <- data@reductions$pca.rev@feature.loadings
-saveRDS(data, file = snakemake@output$rev_pca)
+saveRDS(E, file = snakemake@output$rev_pca)
