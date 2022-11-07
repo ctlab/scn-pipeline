@@ -29,6 +29,27 @@ markers$cluster <- as.factor(markers$cluster)
 markers <- list(markers)
 names(markers) <- c(file_name)
 
+
+markers <- list()
+for (markers_file in snakemake@input$markers) {
+  file_name <- basename(markers_file)
+
+  table <- tryCatch({
+    table <- as.data.frame(fread(markers_file))
+    table$cluster <- as.factor(table$cluster)
+    return(table)
+  },
+  error=function(cond) {
+    message(paste("Error while fread:", markers_file))
+    message("Here's the original error message:")
+    message(cond)
+    return(NULL)
+  })
+  markers[file_name] <- table
+}
+
+
+
 out_dir <- dirname(snakemake@output$descriptor)
 seurat <- readRDS(snakemake@input$seurat)
 
@@ -39,7 +60,10 @@ migrateSeuratObject(seurat,
                     link=link,
                     outdir=out_dir,
                     token=token,
+                    generateMasks=F,
                     markers=markers,
                     public = T,
                     curated = F,
                     generateGMTS = T)
+
+validateSCDataset(out_dir)
