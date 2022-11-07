@@ -21,7 +21,7 @@ rule rev_pca_dataset:
         variable_feature_plot="data/datasets/{dataset}/rev_pca/variable_feature_plot.pdf"
     threads: 4
     resources: mem_mb=128000
-    log: "logs/{dataset}/rev_pca_sample.log"
-    benchmark: "logs/{dataset}/rev_pca_sample.benchmark"
+    log: "logs/{dataset}/rev_pca_dataset.log"
+    benchmark: "logs/{dataset}/rev_pca_dataset.benchmark"
     conda: "../../envs/seurat_analysis.yaml"
     script: "../../scripts/revPCA_dataset.R"
