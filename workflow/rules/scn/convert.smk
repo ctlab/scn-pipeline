@@ -10,7 +10,7 @@ rule convert_to_scn:
         study_meta=rules.parse_geo_meta.output.file_study,
         sample_meta=rules.parse_geo_meta.output.file_sample,
         seurat=rules.seurat_analysis.output.seurat,
-        markers=rules.markers.output.markers[2]
+        markers=rules.markers.output.markers
     output:
         descriptor="data/samples/{dataset}/{sample}/scn/dataset.json",
         plot_data="data/samples/{dataset}/{sample}/scn/plot_data.json",
@@ -74,13 +74,10 @@ rule upload_to_box:
         to_upload=lambda wildcards, output: os.path.split(output["box_receipt"])[0],
         box_path="dump_2022/data/{dataset}_{sample}"
     threads: 4
-    conda: "../../envs/git.yaml"
+    conda: "../../envs/define_technology.yaml"
     log: "logs/{dataset}/{sample}/upload_to_box.log"
     benchmark: "logs/{dataset}/{sample}/upload_to_box.benchmark"
-    shell: """
-    rclone copy {params.to_upload} remote:{params.box_path} -vv --transfers=16 --log-file={log}
-    grep INFO {log} > {output.box_receipt}
-    """
+    script: "../../scripts/UploadToBox.py"
 
 use rule upload_to_box as upload_to_box_merged with:
     input:
@@ -92,7 +89,6 @@ use rule upload_to_box as upload_to_box_merged with:
     params:
         to_upload=lambda wildcards, output: os.path.split(output["box_receipt"])[0],
         box_path="dump_2022/data/{dataset}"
-    conda: "../../envs/git.yaml"
     log: "logs/{dataset}/upload_to_box.log"
     benchmark: "logs/{dataset}/upload_to_box.benchmark"
 
