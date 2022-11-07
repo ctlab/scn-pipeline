@@ -23,13 +23,6 @@ if (snakemake@params$level == "dataset") {
   link <- sample$link
 }
 
-file_name <- basename(snakemake@input$markers)
-markers <- as.data.frame(fread(snakemake@input$markers))
-markers$cluster <- as.factor(markers$cluster)
-markers <- list(markers)
-names(markers) <- c(file_name)
-
-
 markers <- list()
 for (markers_file in snakemake@input$markers) {
   file_name <- basename(markers_file)
