@@ -28,9 +28,9 @@ for (markers_file in snakemake@input$markers) {
   file_name <- basename(markers_file)
 
   table <- tryCatch({
-    table <- as.data.frame(fread(markers_file))
-    table$cluster <- as.factor(table$cluster)
-    return(table)
+    table_tmp <- as.data.frame(fread(markers_file))
+    table_tmp$cluster <- as.factor(table_tmp$cluster)
+    table_tmp
   },
   error=function(cond) {
     message(paste("Error while fread:", markers_file))
@@ -38,7 +38,7 @@ for (markers_file in snakemake@input$markers) {
     message(cond)
     return(NULL)
   })
-  markers[file_name] <- table
+  markers[[file_name]] <- table
 }
 
 
