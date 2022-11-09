@@ -2,8 +2,8 @@ library(Seurat)
 library(SCNPrep)
 library(data.table)
 
-study <- as.data.frame(fread(snakemake@input$study_meta))
-samples <- as.data.frame(fread(snakemake@input$sample_meta))
+study <- as.data.frame(fread(snakemake@input$study_meta, fill=T))
+samples <- as.data.frame(fread(snakemake@input$sample_meta, fill=T))
 
 title <- ""
 description <- ""
