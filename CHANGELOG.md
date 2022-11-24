@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.5](https://github.com/ctlab/scn-pipeline/compare/v1.0.4...v1.0.5) (2022-10-31)
+
+
+### Bug Fixes
+
+* added rm before prefetch, removes locks that can arise from failed jobs ([57e4011](https://github.com/ctlab/scn-pipeline/commit/57e401152ec81dfdef3df57641df76dac0f1188f))
+* fixes 'max(nu, nv) must be strictly less than min(nrow(A), ncol(A))' ([7ff09c1](https://github.com/ctlab/scn-pipeline/commit/7ff09c1b743db5e44730368c710c4fc850ac8b04))
+* handling dim reduction parameters for lower numbers of cells ([1e65429](https://github.com/ctlab/scn-pipeline/commit/1e654295d6a09e4cc0f3e411f5e005766bb522b4))
+* now merge should work with lower numbers of cells ([39076b7](https://github.com/ctlab/scn-pipeline/commit/39076b72c1d2c8c1601a200833b3486b123e82ee))
+
 ## [1.0.4](https://github.com/ctlab/scn-pipeline/compare/v1.0.3...v1.0.4) (2022-10-26)
 
 
